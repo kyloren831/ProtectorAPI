@@ -3,19 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProtectorAPI.Models
 {
-    [Table("Pantallas", Schema = "PROTECTOR_APP")]
-    public class Pantalla
+    [Table("Permisos", Schema = "PROTECTOR_APP")]
+    public class Permiso
     {
         [Key]
-        public int IdPantalla { get; set; }
-        public int IdSistema { get; set; }
+        public int IdPermiso { get; set; }
         public string Descripcion { get; set; }
-        public string FotoUrl { get; set; }
-        public char Estado { get; set; }
-        public Sistema Sistema { get; set; }
         public List<RolPermisoPantalla> RolPermisosPantallas { get; set; }
         public List<UsuarioPermisoPantalla> UsuarioPermisosPantallas { get; set; }
-
 
     }
 }

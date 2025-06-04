@@ -28,7 +28,7 @@ namespace ProtectorAPI.Controllers
                 List<UsuarioDTO> temp = new List<UsuarioDTO>();
                 foreach (var usuario in usuarios)
                 {
-                    temp.Add(new UsuarioDTO()
+                    temp.Add(new UsuarioDTO
                     {
                         IdUsuario = usuario.IdUsuario,
                         Nombre = usuario.Nombre,
@@ -55,7 +55,7 @@ namespace ProtectorAPI.Controllers
                 try
                 {
                     var usuario = await context.Usuarios.FindAsync(id);
-                    UsuarioDTO temp = new UsuarioDTO()
+                    UsuarioDTO temp = new UsuarioDTO
                     {
                         IdUsuario = usuario.IdUsuario,
                         Nombre = usuario.Nombre,
@@ -77,42 +77,85 @@ namespace ProtectorAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] UsuarioDTO usuario)
         {
-            try
+            //Se abre una trasaccion
+            using (var transaccion = context.Database.BeginTransaction())
             {
-                Usuario temp = new Usuario()
+                try
                 {
-                    IdUsuario = usuario.IdUsuario,
-                    Nombre = usuario.Nombre,
-                    Correo = usuario.Correo,
-                    Contrasenna = usuario.Contrasenna,
-                    FechaCreacion = usuario.FechaCreacion,
-                    FotoUrl = usuario.FotoUrl,
-                    Estado = usuario.Estado
-                };
+                    Usuario temp = new Usuario
+                    {
+                        IdUsuario = usuario.IdUsuario,
+                        Nombre = usuario.Nombre,
+                        Correo = usuario.Correo,
+                        Contrasenna = usuario.Contrasenna,
+                        FechaCreacion = usuario.FechaCreacion,
+                        FotoUrl = usuario.FotoUrl,
+                        Estado = usuario.Estado
+                    };
 
-                //await context.Usuarios.AddAsync(temp);
-                return Ok(temp);
+                    // se inserta el usuario y se guardan los cambios
+                    await context.Usuarios.AddAsync(temp);
+                    await context.SaveChangesAsync();
 
+                    // Confirma la transacción
+                    await transaccion.CommitAsync();
+
+                    return Ok(temp);
+
+                }
+                catch (Exception ex)
+                {
+                    // deshace la transacción si ocurre un error 
+                    await transaccion.RollbackAsync();
+                    return BadRequest(ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-           
 
         }
 
         // PUT api/<UsuariosController>/5
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] string value)
+        public async Task<ActionResult<Usuario>> Put(int id, [FromBody] UsuarioDTO usuario)
         {
-            try
+            if (id != usuario.IdUsuario) //Si el id que del URL != id del body return bad request
+                return BadRequest();
+
+
+            //Se abre una trasaccion
+            using (var transaccion = context.Database.BeginTransaction())
             {
-                return Ok(value);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
+                try
+                {
+                    var temp = await context.Usuarios.FindAsync(id);
+
+                    // Si no se encuentra el usuario, retorna NotFound
+                    if (temp == null)
+                        return NotFound();
+
+                    temp.Nombre = usuario.Nombre;
+                    temp.Correo = usuario.Correo;
+                    temp.Contrasenna = usuario.Contrasenna;
+                    temp.FechaCreacion = usuario.FechaCreacion;
+                    temp.FotoUrl = usuario.FotoUrl;
+                    temp.Estado = usuario.Estado;
+                   
+
+                    // se inserta el usuario y se guardan los cambios
+                    context.Usuarios.Update(temp);
+                    await context.SaveChangesAsync();
+
+                    // Confirma la transacción
+                    await transaccion.CommitAsync();
+
+                    return Ok(temp);
+
+                }
+                catch (Exception ex)
+                {
+                    // deshace la transacción si ocurre un error 
+                    await transaccion.RollbackAsync();
+                    return BadRequest(ex.Message);
+                }
             }
         }
 

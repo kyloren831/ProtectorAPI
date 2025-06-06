@@ -2,10 +2,12 @@
 
 namespace ProtectorAPI.Models
 {
-    [Table("Usuarios_Roles", Schema = "PROTECTOR_APP")]
+    [Table("USUARIOS_ROLES", Schema = "PROTECTOR_APP")]
     public class UsuarioRol
     {
+        [Column("IDROL")]
         public int IdRol { get; set; }
+        [Column("IDUSUARIO")]
         public int IdUsuario { get; set; }
         public Usuario Usuario { get; set; }
         public Rol Rol { get; set; }

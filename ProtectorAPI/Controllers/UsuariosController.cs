@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProtectorAPI.Data;
 using ProtectorAPI.DTOs;
 using ProtectorAPI.Models;
+using ProtectorAPI.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,10 +15,12 @@ namespace ProtectorAPI.Controllers
     public class UsuariosController : ControllerBase
     {
         private readonly ProtectorDbContext context;
+        private readonly IEmailService servicioEmail;
 
-        public UsuariosController(ProtectorDbContext context)
+        public UsuariosController(ProtectorDbContext context, IEmailService servicioEmail)
         {
             this.context = context;
+            this.servicioEmail = servicioEmail;
         }
         // GET: api/<UsuariosController>
         [HttpGet]
@@ -93,12 +97,28 @@ namespace ProtectorAPI.Controllers
                         Estado = usuario.Estado
                     };
 
+                    var contrasenna = PasswordGenerator.Generar(10);
+                    usuario.Contrasenna = contrasenna;
+                   
+
+                    var passwordHasher = new PasswordHasher<Usuario>();
+                    //la contrasena se hashea  antes de guardarla
+                    usuario.Contrasenna = passwordHasher.HashPassword(temp, temp.Contrasenna);
+
                     // se inserta el usuario y se guardan los cambios
                     await context.Usuarios.AddAsync(temp);
                     await context.SaveChangesAsync();
 
                     // Confirma la transacción
                     await transaccion.CommitAsync();
+
+                    //Si la transaccion sale bien, se envia el correo con la contrasenia temporal
+                    string cuerpo = $@"
+                                    <h3>Confirmacion de correo electronico</h3>
+                                    <p>Solo funcionara la primera vez que ingrese al sistema.</p>
+                                    <p><strong>Contraseña temporal:</strong> {contrasenna}</p>";
+
+                    await servicioEmail.EnviarEmail(temp.Correo, "Confirmacion de correo electronico", cuerpo);
 
                     return Ok(temp);
 
@@ -115,7 +135,7 @@ namespace ProtectorAPI.Controllers
 
         // PUT api/<UsuariosController>/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<Usuario>> Put(int id, [FromBody] UsuarioDTO usuario)
+        public async Task<ActionResult<Usuario>> Put(int id, [FromBody] PutUsuarioDTO usuario)
         {
             if (id != usuario.IdUsuario) //Si el id que del URL != id del body return bad request
                 return BadRequest();
@@ -134,7 +154,6 @@ namespace ProtectorAPI.Controllers
 
                     temp.Nombre = usuario.Nombre;
                     temp.Correo = usuario.Correo;
-                    temp.Contrasenna = usuario.Contrasenna;
                     temp.FechaCreacion = usuario.FechaCreacion;
                     temp.FotoUrl = usuario.FotoUrl;
                     temp.Estado = usuario.Estado;
@@ -159,9 +178,9 @@ namespace ProtectorAPI.Controllers
             }
         }
 
-        // DELETE api/<UsuariosController>/5
+        // Patch api/<UsuariosController>/5
         [HttpPatch("{id}")]
-        public async Task<ActionResult> ChangeState(int id)
+        public async Task<ActionResult> CambiarEstado(int id)
         {
             using (var transaccion = context.Database.BeginTransaction())
             {
@@ -186,6 +205,37 @@ namespace ProtectorAPI.Controllers
                     await transaccion.CommitAsync();
 
                     return Ok(temp);
+                }
+                catch (Exception ex)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
+
+        // PATCH api/Usuarios/{id}/ChangePass
+        [HttpPatch("{id}/ChangePass")]
+        public async Task<ActionResult> CambiarContrasenna(int id, [FromBody] string nuevaContrasenna)
+        {
+            using (var transaccion = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var usuario = await context.Usuarios.FindAsync(id);
+                    if (usuario == null)
+                        return NotFound();
+
+                    // Se hashea la nueva contraseña antes de guardarla
+                    var passwordHasher = new PasswordHasher<Usuario>();
+                    usuario.Contrasenna = passwordHasher.HashPassword(usuario, nuevaContrasenna);
+
+                    context.Usuarios.Update(usuario);
+                    await context.SaveChangesAsync();
+
+                    await transaccion.CommitAsync();
+
+                    return Ok(new { mensaje = "Contraseña actualizada exitosamente." });
                 }
                 catch (Exception ex)
                 {

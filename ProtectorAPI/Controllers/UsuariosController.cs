@@ -160,16 +160,38 @@ namespace ProtectorAPI.Controllers
         }
 
         // DELETE api/<UsuariosController>/5
-        [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> ChangeState(int id)
         {
-            try
+            using (var transaccion = context.Database.BeginTransaction())
             {
-                return Ok(id);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
+                try
+                {
+                    var temp = await context.Usuarios.FindAsync(id);
+                    if ( temp == null) return NotFound();
+
+                    if (temp.Estado.Equals("A"))
+                    {
+                        temp.Estado = char.Parse("B");
+                    }
+                    else
+                    {
+                        temp.Estado = char.Parse("A");
+                    }
+
+                    context.Usuarios.Update(temp);
+                    await context.SaveChangesAsync();
+
+                    // Confirma la transacción
+                    await transaccion.CommitAsync();
+
+                    return Ok(temp);
+                }
+                catch (Exception ex)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest(ex.Message);
+                }
             }
         }
     }

@@ -148,20 +148,5 @@ namespace ProtectorAPI.Controllers
             }
         }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        [HttpDelete("Borrar")]
-        public ActionResult Delete(int id)
-        {
-            try
-            {
-                return Ok(id);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
     }//class
 }//namespace

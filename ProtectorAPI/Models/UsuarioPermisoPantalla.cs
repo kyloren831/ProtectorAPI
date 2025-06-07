@@ -2,11 +2,14 @@
 
 namespace ProtectorAPI.Models
 {
-    [Table("Usuarios_Permisos_Pantallas", Schema = "PROTECTOR_APP")]
+    [Table("USUARIOS_PERMISOS_PANTALLAS", Schema = "PROTECTOR_APP")]
     public class UsuarioPermisoPantalla
     {
+        [Column("IDUSUARIO")]
         public int IdUsuario { get; set; }
+        [Column("IDPERMISO")]
         public int IdPermiso { get; set; }
+        [Column("IDPANTALLA")]
         public int IdPantalla { get; set; }
 
         public Usuario Usuario { get; set; }

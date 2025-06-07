@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProtectorAPI.Data;
 using ProtectorAPI.DTOs;
 using ProtectorAPI.Models;
+using ProtectorAPI.Services;
+using LoginRequest = ProtectorAPI.DTOs.LoginRequest;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,10 +17,14 @@ namespace ProtectorAPI.Controllers
     public class UsuariosController : ControllerBase
     {
         private readonly ProtectorDbContext context;
+        private readonly IEmailService servicioEmail;
+        private readonly IAuthorizationService authorizationServices;
 
-        public UsuariosController(ProtectorDbContext context)
+        public UsuariosController(ProtectorDbContext context, IEmailService servicioEmail, IAuthorizationService authorizationServices)
         {
             this.context = context;
+            this.servicioEmail = servicioEmail;
+            this.authorizationServices = authorizationServices;
         }
         // GET: api/<UsuariosController>
         [HttpGet]
@@ -93,12 +101,28 @@ namespace ProtectorAPI.Controllers
                         Estado = usuario.Estado
                     };
 
+                    var contrasenna = PasswordGenerator.Generar(10);
+                    temp.Contrasenna = contrasenna;
+                   
+
+                    var passwordHasher = new PasswordHasher<Usuario>();
+                    //la contrasena se hashea  antes de guardarla
+                    temp.Contrasenna = passwordHasher.HashPassword(temp, temp.Contrasenna);
+
                     // se inserta el usuario y se guardan los cambios
                     await context.Usuarios.AddAsync(temp);
                     await context.SaveChangesAsync();
 
                     // Confirma la transacción
                     await transaccion.CommitAsync();
+
+                    //Si la transaccion sale bien, se envia el correo con la contrasenia temporal
+                    string cuerpo = $@"
+                                    <h3>Confirmacion de correo electronico</h3>
+                                    <p>Solo funcionara la primera vez que ingrese al sistema.</p>
+                                    <p><strong>Contraseña temporal:</strong> {contrasenna}</p>";
+
+                    await servicioEmail.EnviarEmail(temp.Correo, "Confirmacion de correo electronico", cuerpo);
 
                     return Ok(temp);
 
@@ -115,7 +139,7 @@ namespace ProtectorAPI.Controllers
 
         // PUT api/<UsuariosController>/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<Usuario>> Put(int id, [FromBody] UsuarioDTO usuario)
+        public async Task<ActionResult<Usuario>> Put(int id, [FromBody] PutUsuarioDTO usuario)
         {
             if (id != usuario.IdUsuario) //Si el id que del URL != id del body return bad request
                 return BadRequest();
@@ -134,7 +158,6 @@ namespace ProtectorAPI.Controllers
 
                     temp.Nombre = usuario.Nombre;
                     temp.Correo = usuario.Correo;
-                    temp.Contrasenna = usuario.Contrasenna;
                     temp.FechaCreacion = usuario.FechaCreacion;
                     temp.FotoUrl = usuario.FotoUrl;
                     temp.Estado = usuario.Estado;
@@ -159,17 +182,86 @@ namespace ProtectorAPI.Controllers
             }
         }
 
-        // DELETE api/<UsuariosController>/5
-        [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        // Patch api/<UsuariosController>/5
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> CambiarEstado(int id)
         {
-            try
+            using (var transaccion = context.Database.BeginTransaction())
             {
-                return Ok(id);
+                try
+                {
+                    var temp = await context.Usuarios.FindAsync(id);
+                    if ( temp == null) return NotFound();
+
+                    if (temp.Estado.Equals("A"))
+                    {
+                        temp.Estado = char.Parse("B");
+                    }
+                    else
+                    {
+                        temp.Estado = char.Parse("A");
+                    }
+
+                    context.Usuarios.Update(temp);
+                    await context.SaveChangesAsync();
+
+                    // Confirma la transacción
+                    await transaccion.CommitAsync();
+
+                    return Ok(temp);
+                }
+                catch (Exception ex)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest(ex.Message);
+                }
             }
-            catch (Exception ex)
+        }
+
+        // PATCH api/Usuarios/{id}/ChangePass
+        [HttpPatch("{id}/ChangePass")]
+        public async Task<ActionResult> CambiarContrasenna(int id, [FromBody] string nuevaContrasenna)
+        {
+            using (var transaccion = context.Database.BeginTransaction())
             {
-                return BadRequest(ex.Message);
+                try
+                {
+                    var usuario = await context.Usuarios.FindAsync(id);
+                    if (usuario == null)
+                        return NotFound();
+
+                    // Se hashea la nueva contraseña antes de guardarla
+                    var passwordHasher = new PasswordHasher<Usuario>();
+                    usuario.Contrasenna = passwordHasher.HashPassword(usuario, nuevaContrasenna);
+
+                    context.Usuarios.Update(usuario);
+                    await context.SaveChangesAsync();
+
+                    await transaccion.CommitAsync();
+
+                    return Ok(new { mensaje = "Contraseña actualizada exitosamente." });
+                }
+                catch (Exception ex)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest(ex.Message);
+                }
+            }
+
+        }
+
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> Autenticar([FromBody] LoginRequest loginRequest)
+        {
+            var autorizado = await authorizationServices.GetToken(loginRequest.Email, loginRequest.Password);
+            if (autorizado == null)
+            {
+                return Unauthorized();
+            }
+            else
+            {
+                return Ok(autorizado);
             }
         }
     }

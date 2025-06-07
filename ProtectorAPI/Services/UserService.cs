@@ -40,7 +40,7 @@ namespace ProtectorAPI.Services
 
             // Permisos directos filtrados por pantallas activas y sistemas activos
             var directosPorPantalla = usuario.UsuarioPermisosPantallas
-                .Where(up => up.Pantalla.Estado == 'A' && up.Pantalla.Sistema.Estado.Equals( 'A'))
+                .Where(up => up.Pantalla.Estado.Equals('A') && up.Pantalla.Sistema.Estado.Equals( 'A'))
                 .GroupBy(up => up.Pantalla)
                 .Select(g => new PantallaConPermisosDTO
                 {

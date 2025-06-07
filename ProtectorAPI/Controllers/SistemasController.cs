@@ -88,6 +88,7 @@ namespace ProtectorAPI.Controllers
         }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
         [HttpGet("Buscar")]
         public async Task<ActionResult<SistemaDTO>> Get(int id)
         {
@@ -112,7 +113,6 @@ namespace ProtectorAPI.Controllers
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        // PUT api/<UsuariosController>/5
         [HttpPut("Actualizar")]
         public async Task<ActionResult<Sistema>> Put(int id, [FromBody] SistemaDTO sistema)
         {

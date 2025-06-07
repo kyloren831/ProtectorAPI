@@ -43,6 +43,11 @@ namespace ProtectorAPI.Data
                 .WithMany(r => r.RolPermisosPantallas)
                 .HasForeignKey(rp => rp.IdPermiso);
 
+            modelBuilder.Entity<RolPermisoPantalla>()
+                .HasOne(rp => rp.Pantalla)
+                .WithMany(p => p.RolPermisosPantallas)
+                .HasForeignKey(rp => rp.IdPantalla);
+
             modelBuilder.Entity<UsuarioPermisoPantalla>()
                 .HasOne(up=> up.Usuario)
                 .WithMany(p=>p.UsuarioPermisosPantallas)
@@ -53,6 +58,11 @@ namespace ProtectorAPI.Data
                 .WithMany(p => p.UsuarioPermisosPantallas)
                 .HasForeignKey(up => up.IdPermiso);
 
+            modelBuilder.Entity<UsuarioPermisoPantalla>()
+                .HasOne(up => up.Pantalla)
+                .WithMany(p => p.UsuarioPermisosPantallas)
+                .HasForeignKey(up => up.IdPantalla);
+
             modelBuilder.Entity<UsuarioRol>()
                 .HasOne(ur => ur.Usuario)
                 .WithMany(r => r.UsuarioRoles)
@@ -62,6 +72,16 @@ namespace ProtectorAPI.Data
                 .HasOne(ur => ur.Rol)
                 .WithMany(r => r.UsuarioRoles)
                 .HasForeignKey(ur => ur.IdRol);
+
+           modelBuilder.Entity<Pantalla>()
+        .HasOne(p => p.Sistema)
+        .WithMany(s => s.Pantallas)
+        .HasForeignKey(p => p.IdSistema);
+
+            
+
+            // Completa la FK de RolPermisoPantalla a Pantalla
+            
         }
 
     }

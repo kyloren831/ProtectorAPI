@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProtectorAPI.Data;
 using ProtectorAPI.DTOs;
 using ProtectorAPI.Models;
 using ProtectorAPI.Services;
+using LoginRequest = ProtectorAPI.DTOs.LoginRequest;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,11 +18,13 @@ namespace ProtectorAPI.Controllers
     {
         private readonly ProtectorDbContext context;
         private readonly IEmailService servicioEmail;
+        private readonly IAuthorizationService authorizationServices;
 
-        public UsuariosController(ProtectorDbContext context, IEmailService servicioEmail)
+        public UsuariosController(ProtectorDbContext context, IEmailService servicioEmail, IAuthorizationService authorizationServices)
         {
             this.context = context;
             this.servicioEmail = servicioEmail;
+            this.authorizationServices = authorizationServices;
         }
         // GET: api/<UsuariosController>
         [HttpGet]
@@ -98,12 +102,12 @@ namespace ProtectorAPI.Controllers
                     };
 
                     var contrasenna = PasswordGenerator.Generar(10);
-                    usuario.Contrasenna = contrasenna;
+                    temp.Contrasenna = contrasenna;
                    
 
                     var passwordHasher = new PasswordHasher<Usuario>();
                     //la contrasena se hashea  antes de guardarla
-                    usuario.Contrasenna = passwordHasher.HashPassword(temp, temp.Contrasenna);
+                    temp.Contrasenna = passwordHasher.HashPassword(temp, temp.Contrasenna);
 
                     // se inserta el usuario y se guardan los cambios
                     await context.Usuarios.AddAsync(temp);
@@ -242,6 +246,22 @@ namespace ProtectorAPI.Controllers
                     await transaccion.RollbackAsync();
                     return BadRequest(ex.Message);
                 }
+            }
+
+        }
+
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> Autenticar([FromBody] LoginRequest loginRequest)
+        {
+            var autorizado = await authorizationServices.GetToken(loginRequest.Email, loginRequest.Password);
+            if (autorizado == null)
+            {
+                return Unauthorized();
+            }
+            else
+            {
+                return Ok(autorizado);
             }
         }
     }

@@ -1,11 +1,13 @@
 ﻿using ProtectorAPI.Data;
 using ProtectorAPI.DTOs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 namespace ProtectorAPI.Services
 {
     public interface IUserService
     {
         Task<List<PantallaConPermisosDTO>> ObtenerPantallasConPermisos(int idUsuario);
+        Task<List<PantallaConPermisosDTO>> ObtenerPantallasConTodosLosPermisos();
     }
 
     public class UserService : IUserService
@@ -40,7 +42,7 @@ namespace ProtectorAPI.Services
 
             // Permisos directos filtrados por pantallas activas y sistemas activos
             var directosPorPantalla = usuario.UsuarioPermisosPantallas
-                .Where(up => up.Pantalla.Estado == 'A' && up.Pantalla.Sistema.Estado.Equals( 'A'))
+                .Where(up => up.Pantalla.Estado.Equals('A') && up.Pantalla.Sistema.Estado.Equals( 'A'))
                 .GroupBy(up => up.Pantalla)
                 .Select(g => new PantallaConPermisosDTO
                 {
@@ -85,5 +87,44 @@ namespace ProtectorAPI.Services
 
             return pantallasTotales;
         }
+
+
+        public async Task<List<PantallaConPermisosDTO>> ObtenerPantallasConTodosLosPermisos()
+        {
+            // Traer las pantallas activas y sus relaciones
+            var pantallas = await context.Pantallas
+                .Where(p => p.Estado.Equals('A') && p.Sistema.Estado.Equals('A'))
+                .Include(p => p.RolPermisosPantallas)
+                    .ThenInclude(rp => rp.Permiso)
+                .Include(p => p.UsuarioPermisosPantallas)
+                    .ThenInclude(up => up.Permiso)
+                .Include(p => p.Sistema)
+                .ToListAsync();
+
+            var resultado = pantallas.Select(p => new PantallaConPermisosDTO
+            {
+                IdPantalla = p.IdPantalla,
+                DescripcionPantalla = p.Descripcion,
+                Permisos = p.RolPermisosPantallas
+                                .Select(rp => new PermisoDTO
+                                {
+                                    IdPermiso = rp.Permiso.IdPermiso,
+                                    Descripcion = rp.Permiso.Descripcion
+                                })
+                                .Concat(
+                                    p.UsuarioPermisosPantallas.Select(up => new PermisoDTO
+                                    {
+                                        IdPermiso = up.Permiso.IdPermiso,
+                                        Descripcion = up.Permiso.Descripcion
+                                    })
+                                )
+                                .Distinct() // eliminar duplicados
+                                .ToList()
+            }).ToList();
+
+            return resultado;
+        }
+
+
     }
 }

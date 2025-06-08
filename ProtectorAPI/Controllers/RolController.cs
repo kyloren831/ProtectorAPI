@@ -25,6 +25,7 @@ namespace ProtectorAPI.Controllers
 /////////////////////////////////////////////////////////////////////////////////
 
         [HttpGet("Listar")]
+
         public async Task<ActionResult<List<RolDTO>>> Get()
         {
             try
@@ -38,6 +39,7 @@ namespace ProtectorAPI.Controllers
                 {
                     temp.Add(new RolDTO
                     {
+
                         IdRol = rol.IdRol,
                         Descripcion = rol.Descripcion
                     });
@@ -138,5 +140,33 @@ namespace ProtectorAPI.Controllers
             }
         }
 
+/////////////////////////////////////////////////////////////////////////////////
+ 
+        [HttpDelete("Eliminar")]
+        public async Task<ActionResult> Delete([FromQuery] int id)
+        {
+            using (var transaccion = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var temp = await context.Roles.FindAsync(id);
+
+                    if (temp == null)
+                        return NotFound("Rol no encontrado.");
+
+                    context.Roles.Remove(temp);
+                    await context.SaveChangesAsync();
+
+                    await transaccion.CommitAsync();
+
+                    return Ok("Rol eliminado correctamente.");
+                }
+                catch (Exception ex)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest($"Error al eliminar el Rol: {ex.Message}");
+                }
+            }
+        }
     }//class
 }//namespace

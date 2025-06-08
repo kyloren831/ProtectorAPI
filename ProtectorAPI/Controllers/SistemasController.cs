@@ -148,5 +148,34 @@ namespace ProtectorAPI.Controllers
             }
         }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        [HttpDelete("Eliminar")]
+        public async Task<ActionResult> Delete([FromQuery] int id)
+        {
+            using (var transaccion = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var temp = await context.Sistemas.FindAsync(id);
+
+                    if (temp == null)
+                        return NotFound("Sistema no encontrado.");
+
+                    context.Sistemas.Remove(temp);
+                    await context.SaveChangesAsync();
+
+                    await transaccion.CommitAsync();
+
+                    return Ok("Sistema eliminado correctamente.");
+                }
+                catch (Exception ex)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest($"Error al eliminar el Sistema: {ex.Message}");
+                }
+            }
+        }
+
     }//class
 }//namespace

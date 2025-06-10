@@ -18,7 +18,7 @@ namespace ProtectorAPI.Data
         public DbSet<RolPermisoPantalla> RolPermisosPantallas { get; set; }
         public DbSet<UsuarioPermisoPantalla> UsuarioPermisosPantallas { get; set; }
         public DbSet<UsuarioRol> UsuarioRoles { get; set; }
-
+        public DbSet<BitacoraUsuarios> BitacoraUsuarios { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -78,6 +78,9 @@ namespace ProtectorAPI.Data
         .WithMany(s => s.Pantallas)
         .HasForeignKey(p => p.IdSistema);
 
+            modelBuilder.Entity<BitacoraUsuarios>().HasOne(bu => bu.Usuario)
+                .WithMany(u => u.BitacoraUsuarios)
+                .HasForeignKey(bu => bu.IdUsuario);
             
 
             // Completa la FK de RolPermisoPantalla a Pantalla

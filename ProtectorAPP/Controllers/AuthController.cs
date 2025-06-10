@@ -48,11 +48,19 @@ namespace ProtectorAPP.Controllers
         [HttpGet]
         public ActionResult Login()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Si está autenticado, redirigir al home o alguna página principal
+                return RedirectToAction("Index", "Home");
+            }
+
             return View();
         }
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
+            
+
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 ViewBag.Error = "Debe ingresar correo y contraseña";
@@ -94,7 +102,7 @@ namespace ProtectorAPP.Controllers
                     // Propiedades de autenticación
                     var authProperties = new AuthenticationProperties
                     {
-                        IsPersistent = true,                             // Persistente (la cookie durará entre sesiones)
+                        IsPersistent = false,                             // Persistente (la cookie durará entre sesiones)
                         ExpiresUtc = DateTime.UtcNow.AddMinutes(30)      // Expiración de la cookie (30 minutos)
                     };
 
@@ -155,12 +163,11 @@ namespace ProtectorAPP.Controllers
 
 
 
-        public IActionResult Logout()
+        [HttpGet("Logout")]
+        public async Task<IActionResult> Logout()
         {
-            HttpContext.Session.Remove("JWT_Token");
-            HttpContext.Session.Remove("UserId");
-            HttpContext.Session.Remove("UserName");
-
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); // Eliminar la cookie
+            TempData["Mensaje"] = "Sesión cerrada correctamente.";
             return RedirectToAction("Login");
         }
 

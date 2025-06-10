@@ -7,31 +7,48 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ProtectorAPP.styles.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
 </head>
 <body>
-    <header>
-        @if (User.Identity.IsAuthenticated)
-        {       <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-                <div class="container-fluid">
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ProtectorAPP</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                        <ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                            </li>
+    @if (User.Identity.IsAuthenticated)
+    {  
+        <header>
+
+            <nav id="asideMenu" class="asideMenu d-flex flex-column  align-items-center bg-primary text-white rounded-4 p-3 position-fixed top-0 start-0 d-none d-md-flex">
+                <div class="d-flex flex-column align-items-center">
+                    <a asp-controller="Home" asp-action="Index">
+                        <img alt="Protector App img" src="@Url.Content("~/img/ProtectorAPP/IconoProtectorLight.png")" class="mb-2" width="125" height="80" />
+
+                    </a>
+                    <span class="fw-semibold fs-6 text-center">Seguridad</span>
+                </div>
+                
+                    <div class="w-100">
+                        <ul class="asideMenuButtons">
+                            <li>Gestion de Usuarios</li>
+                            <li>Gestion de Roles</li>
+                            <li>Gestion de Sistemas</li>
                         </ul>
                     </div>
-                </div>
-            </nav>
-        }
-    </header>
+              
+                
+                    <a asp-controller="Auth" asp-action="Logout" class="logout-btn btn btn-link text-warning fw-semibold d-flex align-items-center justify-content-center gap-1 p-0 mx-3" style="font-size: 0.75rem;">
+                        <i class="fas fa-power-off"></i>
+                        Cerrar Sesion
+                    </a>
+                </nav>
+       
+        </header>
+        <div class="user-info">
+            <div class="name">
+                Aaron Mendez
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    }
     <div class="container-fluid">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -39,10 +56,12 @@
     </div>
     @if (User.Identity.IsAuthenticated)
     {
-
-        <footer class="border-top footer text-muted">
-            <div class="container">
-                &copy; 2025 - ProtectorAPP - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        <footer class="footer bg-primary text-white d-flex justify-content-between align-items-center px-3 py-2 mt-auto">
+            <span>Copyright © 2025. All rights reserved.</span>
+            <div class="d-flex gap-3 fs-5">
+                <a href="#" class="text-white" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-white" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-white" aria-label="Google Plus"><i class="fab fa-google-plus-g"></i></a>
             </div>
         </footer>
     }

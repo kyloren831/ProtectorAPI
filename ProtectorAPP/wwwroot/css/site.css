@@ -1,26 +1,86 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
-    background-color: #4b5563; /* Tailwind gray-600 */
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
+    background-color: #4b5563;
     margin-bottom: 60px;
 }
+.asideMenu {
+    padding: 20px;
+    width: 10rem;
+    height: 800px;
+    padding: 1.5rem 0;
+    margin: 1rem;
+    border-radius: 2rem;
+}
+    .asideMenu .logout-btn {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #f97316;
+        border: none;
+        background: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        cursor: pointer;
+        padding: 0;
+        margin: 0 1rem;
+    }
+.asideMenuButtons{
+    
+}
+.user-info {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    color: #d1d5db;
+    font-size: 0.875rem;
+    user-select: none;
+    text-align: right;
+    z-index: 1000;
+}
+
+    .user-info .name {
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .user-info .avatar {
+        background-color: #6b7280;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #d1d5db;
+        font-size: 1rem;
+        margin-left: auto;
+    }
+
+.asideMenuButtons {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.5rem 0;
+    font-size: 0.5rem;
+    text-align: center;
+    color: white;
+    width: 100%;
+}
+
+    .asideMenuButtons li {
+        margin: 0.25rem 0;
+        cursor: pointer;
+        user-select: none;
+        border-radius: 0.5rem;
+        padding: 0.15rem 0.25rem;
+        transition: background-color 0.3s ease;
+    }
+
+        .asideMenuButtons li:hover {
+            background-color: #FF6F00;
+            color: white;
+            text-decoration: none;
+        }
+

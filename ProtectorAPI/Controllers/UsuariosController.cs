@@ -49,36 +49,36 @@ namespace ProtectorAPI.Controllers
                 }
                 return Ok(temp);
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
-                    return BadRequest(ex.Message);
+                return BadRequest(ex.Message);
             }
-            
+
         }
 
         // GET api/<UsuariosController>/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UsuarioDTO>> Get(int id)
         {
-                try
+            try
+            {
+                var usuario = await context.Usuarios.FindAsync(id);
+                UsuarioDTO temp = new UsuarioDTO
                 {
-                    var usuario = await context.Usuarios.FindAsync(id);
-                    UsuarioDTO temp = new UsuarioDTO
-                    {
-                        IdUsuario = usuario.IdUsuario,
-                        Nombre = usuario.Nombre,
-                        Correo = usuario.Correo,
-                        Contrasenna = usuario.Contrasenna,
-                        FechaCreacion = usuario.FechaCreacion,
-                        FotoUrl = usuario.FotoUrl,
-                        Estado = usuario.Estado
-                    };
-                    return Ok(temp);
-                }catch (Exception ex)
-                {
-                      return BadRequest(ex.Message);
-                }
-           
+                    IdUsuario = usuario.IdUsuario,
+                    Nombre = usuario.Nombre,
+                    Correo = usuario.Correo,
+                    Contrasenna = usuario.Contrasenna,
+                    FechaCreacion = usuario.FechaCreacion,
+                    FotoUrl = usuario.FotoUrl,
+                    Estado = usuario.Estado
+                };
+                return Ok(temp);
+            } catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
         // POST api/<UsuariosController>
@@ -103,7 +103,7 @@ namespace ProtectorAPI.Controllers
 
                     var contrasenna = PasswordGenerator.Generar(10);
                     temp.Contrasenna = contrasenna;
-                   
+
 
                     var passwordHasher = new PasswordHasher<Usuario>();
                     //la contrasena se hashea  antes de guardarla
@@ -161,7 +161,7 @@ namespace ProtectorAPI.Controllers
                     temp.FechaCreacion = usuario.FechaCreacion;
                     temp.FotoUrl = usuario.FotoUrl;
                     temp.Estado = usuario.Estado;
-                   
+
 
                     // se inserta el usuario y se guardan los cambios
                     context.Usuarios.Update(temp);
@@ -191,7 +191,7 @@ namespace ProtectorAPI.Controllers
                 try
                 {
                     var temp = await context.Usuarios.FindAsync(id);
-                    if ( temp == null) return NotFound();
+                    if (temp == null) return NotFound();
 
                     if (temp.Estado.Equals("A"))
                     {
@@ -220,23 +220,35 @@ namespace ProtectorAPI.Controllers
 
         // PATCH api/Usuarios/{id}/ChangePass
         [HttpPatch("{id}/ChangePass")]
-        public async Task<ActionResult> CambiarContrasenna(int id, [FromBody] string nuevaContrasenna)
+        public async Task<ActionResult> CambiarContrasenna(int id, [FromBody] UsuarioContraseniaDTO dto)
         {
+            
             using (var transaccion = context.Database.BeginTransaction())
             {
                 try
                 {
                     var usuario = await context.Usuarios.FindAsync(id);
+
                     if (usuario == null)
                         return NotFound();
 
-                    // Se hashea la nueva contraseña antes de guardarla
+                    // Se crea el hasher para verificar la contraseña
                     var passwordHasher = new PasswordHasher<Usuario>();
-                    usuario.Contrasenna = passwordHasher.HashPassword(usuario, nuevaContrasenna);
 
+                    // Verifica la contraseña antigua, que llega en texto plano
+                    var result = passwordHasher.VerifyHashedPassword(usuario, usuario.Contrasenna, dto.ContrasenniaVieja);
+
+                    if (result != PasswordVerificationResult.Success)
+                        return BadRequest("La contraseña antigua no es correcta.");
+
+                    // Hashea la nueva contraseña antes de guardarla
+                    usuario.Contrasenna = passwordHasher.HashPassword(usuario, dto.ContrasenniaNueva);
+
+                    // Actualiza el usuario con la nueva contraseña
                     context.Usuarios.Update(usuario);
                     await context.SaveChangesAsync();
 
+                    // Confirma la transacción
                     await transaccion.CommitAsync();
 
                     return Ok(new { mensaje = "Contraseña actualizada exitosamente." });
@@ -264,5 +276,23 @@ namespace ProtectorAPI.Controllers
                 return Ok(autorizado);
             }
         }
+        [HttpGet]
+        [Route("{id}/CheckFirstLogin")]
+        public async Task<IActionResult> CheckFirst(int id)
+        {
+            try
+            {
+                var existe = await context.BitacoraUsuarios.FirstOrDefaultAsync(x=>x.IdUsuario==id);
+                if(existe == null)
+                {
+                    return Ok();
+                }
+                return BadRequest("No es el primer ingreso");
+            }
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
+        }
+        
     }
 }

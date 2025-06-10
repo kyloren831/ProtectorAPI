@@ -28,5 +28,6 @@ namespace ProtectorAPI.Models
         public char Estado { get; set; }
         public List<UsuarioRol>  UsuarioRoles { get; set; }
         public List<UsuarioPermisoPantalla> UsuarioPermisosPantallas { get; set; }
+        public List <BitacoraUsuarios> BitacoraUsuarios { get; set; }
     }
 }

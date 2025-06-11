@@ -92,6 +92,9 @@ namespace ProtectorAPP.Controllers
 
                 if (authResponse != null)
                 {
+                    // Guardar el token JWT en la sesión
+                    HttpContext.Session.SetString("JwtToken", authResponse.Token);
+
                     var handler = new JwtSecurityTokenHandler();
                     var jwt = handler.ReadJwtToken(authResponse.Token);
 

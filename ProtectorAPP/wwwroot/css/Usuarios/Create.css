@@ -1,0 +1,12 @@
+﻿.main-container {
+    margin-top: 100px;
+    margin-left: 250px;
+    margin-right: 250px;
+    background-color: #faecec;
+    border-radius: 1rem;
+    height: 710px;
+    padding: 0px;
+    box-shadow: 10px 10px 10px 10px;
+    overflow: hidden; /* Cortar el contenido que se desborda sin activar desplazamiento */
+    position: relative;
+}

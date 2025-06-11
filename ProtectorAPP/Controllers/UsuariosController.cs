@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net.Http.Headers;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ProtectorAPP.Models;
@@ -88,19 +91,50 @@ namespace ProtectorAPP.Controllers
             return View();
         }
 
-        // POST: UsuariosController/Delete/5
+        // PATCH: UsuariosController/5
+        // PATCH: UsuariosController/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> CambiarEstado(int id)
         {
             try
             {
+                var token = HttpContext.Session.GetString("JwtToken");
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    // Llamar al API para cambiar el estado del usuario
+                    var response = await _httpClient.PatchAsync($"Usuarios/{id}", null); // Aquí se puede agregar el contenido si es necesario
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Al éxito, redirige y pasa el mensaje de éxito
+                        TempData["SuccessMessage"] = "Estado cambiado exitosamente.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        // Si la respuesta no es exitosa, devolver mensaje de error
+                        TempData["ErrorMessage"] = "Hubo un problema al cambiar el estado.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+                else
+                {
+                    // Si la respuesta no es exitosa, devolver mensaje de error
+                    TempData["ErrorMessage"] = "Debe iniciar sesion";
+                    return RedirectToAction(nameof(Index));
+                }
+               
+            }
+            catch (Exception ex)
+            {
+                // En caso de error, captura y muestra el mensaje
+                TempData["ErrorMessage"] = $"Error: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
         }
+
     }
 }

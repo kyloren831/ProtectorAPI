@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var userName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -20,18 +23,31 @@
                         <img alt="Protector App img" src="@Url.Content("~/img/ProtectorAPP/IconoProtectorLight.png")" class="mb-2" width="125" height="80" />
 
                     </a>
-                    <span class="fw-semibold fs-6 text-center">Seguridad</span>
+                    <span class="fw-semibold fs-3 text-center">Seguridad</span>
                 </div>
-                
+                @if (User.IsInRole("Admin"))
+                {
                     <div class="w-100">
                         <ul class="asideMenuButtons">
-                            <li>Gestion de Usuarios</li>
-                            <li>Gestion de Roles</li>
-                            <li>Gestion de Sistemas</li>
+                            <li>
+                                <a asp-controller="Usuarios" asp-action="Index">
+                                    <i class="fas fa-user-circle mx-2"></i> Usuarios
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-controller="Usuarios" asp-action="Index">
+                                    <i class="fas fa-project-diagram mx-2"></i>   Roles
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-controller="Usuarios" asp-action="Index">
+                                    <i class="fab fa-windows mx-2"></i> Sistemas
+                                </a>
+                            </li>
                         </ul>
                     </div>
-              
-                
+
+                }
                     <a asp-controller="Auth" asp-action="Logout" class="logout-btn btn btn-link text-warning fw-semibold d-flex align-items-center justify-content-center gap-1 p-0 mx-3" style="font-size: 0.75rem;">
                         <i class="fas fa-power-off"></i>
                         Cerrar Sesion
@@ -41,7 +57,7 @@
         </header>
         <div class="user-info">
             <div class="name">
-                Aaron Mendez
+                @userName
                 <i class="fas fa-chevron-down"></i>
             </div>
             <div class="avatar">

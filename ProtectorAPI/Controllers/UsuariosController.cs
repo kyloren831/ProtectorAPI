@@ -41,7 +41,6 @@ namespace ProtectorAPI.Controllers
                         IdUsuario = usuario.IdUsuario,
                         Nombre = usuario.Nombre,
                         Correo = usuario.Correo,
-                        Contrasenna = usuario.Contrasenna,
                         FechaCreacion = usuario.FechaCreacion,
                         FotoUrl = usuario.FotoUrl,
                         Estado = usuario.Estado
@@ -68,7 +67,6 @@ namespace ProtectorAPI.Controllers
                     IdUsuario = usuario.IdUsuario,
                     Nombre = usuario.Nombre,
                     Correo = usuario.Correo,
-                    Contrasenna = usuario.Contrasenna,
                     FechaCreacion = usuario.FechaCreacion,
                     FotoUrl = usuario.FotoUrl,
                     Estado = usuario.Estado
@@ -95,7 +93,7 @@ namespace ProtectorAPI.Controllers
                         IdUsuario = usuario.IdUsuario,
                         Nombre = usuario.Nombre,
                         Correo = usuario.Correo,
-                        Contrasenna = usuario.Contrasenna,
+                        Contrasenna = "",
                         FechaCreacion = usuario.FechaCreacion,
                         FotoUrl = usuario.FotoUrl,
                         Estado = usuario.Estado

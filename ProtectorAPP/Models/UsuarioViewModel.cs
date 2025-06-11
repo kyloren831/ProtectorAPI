@@ -1,6 +1,6 @@
-﻿namespace ProtectorAPI.DTOs
+﻿namespace ProtectorAPP.Models
 {
-    public class UsuarioDTO
+    public class UsuarioViewModel
     {
         public int IdUsuario { get; set; }
         public string Nombre { get; set; }

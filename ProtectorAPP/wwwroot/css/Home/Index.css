@@ -1,0 +1,27 @@
+﻿.main-container {
+    margin-top: 100px;
+    margin-left: 250px;
+    margin-right: 250px;
+    padding: 25px;
+    padding-left: 50px;
+    padding-right: 50px;
+    background-color: #B0B0B0;
+    border-radius: 1rem;
+    height: 710px;
+    box-shadow:10px 10px 10px 10px;
+}
+h1 {
+    color: #4b5563;
+}
+h4 {
+    color: #4b5563;
+}
+.main-container .systems-container {
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    background-color: #fff;
+    width: 150px;
+    height: 50px;
+    border-radius: 1rem;
+}

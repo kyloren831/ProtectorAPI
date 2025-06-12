@@ -83,8 +83,10 @@ namespace ProtectorAPI.Controllers
 
         // POST api/<UsuariosController>
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> Post([FromBody] PostUsuarioDTO usuario)
         {
+            
             //Se abre una trasaccion
             using (var transaccion = context.Database.BeginTransaction())
             {

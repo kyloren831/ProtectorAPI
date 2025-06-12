@@ -22,7 +22,6 @@ table {
     border-collapse: collapse; /* Eliminar los espacios entre las celdas */
     margin-left: auto; /* Centrar la tabla */
     margin-right: auto; /* Centrar la tabla */
-    background-color: ##B0B0B0;
 }
 
 th, td {

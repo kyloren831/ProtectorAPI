@@ -10,3 +10,74 @@
     overflow: hidden; /* Cortar el contenido que se desborda sin activar desplazamiento */
     position: relative;
 }
+
+.input-icon {
+    position: relative;
+}
+
+    .input-icon i {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+    }
+
+    .input-icon input {
+        padding-left: 30px; /* Espacio para que el texto no se solape con el ícono */
+    }
+
+#preview-container {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #ccc;
+    margin-top: 10px;
+}
+
+#preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Asegura que la imagen cubra el área sin deformarse */
+}
+/* Estilo para la imagen con borde redondeado */
+#preview-container {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #ccc;
+    margin-top: 10px;
+}
+
+#preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Asegura que la imagen cubra el área sin deformarse */
+}
+
+/* Estilo para personalizar el input de archivo */
+.custom-file input[type="file"] {
+    display: none; /* Oculta el input original */
+}
+
+.custom-file {
+    width: 50%;
+}
+
+    .custom-file::before {
+        content: 'Haga clic para cambiar la foto'; /* Texto que aparece en el botón */
+        
+        color: #4b5563;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        width: 50%;
+        cursor: pointer;
+        
+    }
+
+    

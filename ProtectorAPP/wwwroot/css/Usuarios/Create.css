@@ -7,9 +7,13 @@
     height: 710px;
     padding: 0px;
     box-shadow: 10px 10px 10px 10px;
-    overflow: hidden; /* Cortar el contenido que se desborda sin activar desplazamiento */
     position: relative;
+    /* Barra de desplazamiento solo cuando sea necesario */
+    overflow: hidden; /* La barra de desplazamiento solo aparecerá cuando el contenido se desborde */
 }
+
+
+   
 
 .input-icon {
     position: relative;
@@ -64,20 +68,23 @@
 
 .custom-file {
     width: 50%;
+    text-align: center;
 }
 
     .custom-file::before {
         content: 'Haga clic para cambiar la foto'; /* Texto que aparece en el botón */
         
         color: #4b5563;
-        padding: 10px 20px;
         border-radius: 25px;
         font-size: 16px;
         font-weight: bold;
         text-align: center;
-        width: 50%;
+        width: 100%;
         cursor: pointer;
         
     }
-
-    
+.row.d-flex {
+    display: flex;
+    justify-content: center; /* Centra los elementos horizontalmente */
+    align-items: center; /* Centra los elementos verticalmente */
+}

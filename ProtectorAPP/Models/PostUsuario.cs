@@ -9,9 +9,6 @@ namespace ProtectorAPP.Models
         public string Correo { get; set; }
         public string FotoUrl { get; set; }
 
-        [JsonIgnore]
-        [NotMapped]
-        public IFormFile? ImagenFile { get; set; }
 
     }
 }

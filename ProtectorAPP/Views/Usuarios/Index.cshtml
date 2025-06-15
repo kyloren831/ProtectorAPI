@@ -37,7 +37,6 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-
     <table class="table">
         <thead>
             <tr>
@@ -55,8 +54,9 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
-            {
+           
+                @foreach (var item in Model)
+                {
                 <tr>
                     <td>
                         <div class="d-flex align-items-center">
@@ -66,10 +66,10 @@
                             <!-- Contenedor de texto -->
                             <div class="d-flex flex-column text-start">
                                 <div>
-                                    @Html.DisplayFor(modelItem => item.Nombre)
+                                        @Html.DisplayFor(modelItem => item.Nombre)
                                 </div>
                                 <div>
-                                    @Html.DisplayFor(modelItem => item.Correo)
+                                        @Html.DisplayFor(modelItem => item.Correo)
                                 </div>
                             </div>
                         </div>
@@ -77,20 +77,20 @@
 
 
                     <td>
-                        @Html.DisplayFor(modelItem => item.FechaCreacion)
+                            @Html.DisplayFor(modelItem => item.FechaCreacion)
                     </td>
-                    <td >
-                        @if (item.Estado.ToString().Equals("A"))
-                        {
-                        <div class="td-activo d-flex justify-content-center"> Activo </div>
-                        }
-                        else
-                        {
+                    <td>
+                            @if (item.Estado.ToString().Equals("A"))
+                            {
+                            <div class="td-activo d-flex justify-content-center"> Activo </div>
+                            }
+                            else
+                            {
                             <div class="td-inactivo d-flex justify-content-center"> Inactivo </div>
-                        }
+                            }
                     </td>
-                        
-                    
+
+
                     <td>
                         <a type="button" class="btn btn-details" asp-controller="Usuarios" asp-action="Details" asp-route-id="@item.IdUsuario">
                             <i class="fas fa-eye"></i>
@@ -98,9 +98,9 @@
                         <a type="button" class="btn btn-edit" asp-controller="Usuarios" asp-action="Edit" asp-route-id="@item.IdUsuario">
                             <i class="fas fa-edit"></i>
                         </a>
-                        @{
-                            string IDModal = "L" + item.IdUsuario;
-                        }
+                            @{
+                                string IDModal = "L" + item.IdUsuario;
+                            }
 
                         <!-- Button trigger modal -->
                         <button type="button" class="btn btn-off" data-bs-toggle="modal" data-bs-target="#@IDModal">
@@ -132,10 +132,12 @@
 
                     </td>
                 </tr>
-            }
+                }
+            
+            
         </tbody>
     </table>
-
+   
    
 
 </div>

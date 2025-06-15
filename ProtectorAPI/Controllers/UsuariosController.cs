@@ -161,9 +161,7 @@ namespace ProtectorAPI.Controllers
 
                     temp.Nombre = usuario.Nombre;
                     temp.Correo = usuario.Correo;
-                    temp.FechaCreacion = usuario.FechaCreacion;
                     temp.FotoUrl = usuario.FotoUrl;
-                    temp.Estado = usuario.Estado;
 
 
                     // se inserta el usuario y se guardan los cambios

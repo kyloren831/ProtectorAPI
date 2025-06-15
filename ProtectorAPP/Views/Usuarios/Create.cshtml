@@ -1,0 +1,94 @@
+﻿@model ProtectorAPP.Models.PostUsuarioViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+<div class="main-container d-flex justify-content-center">
+
+    <div class="d-flex align-items-center justify-content-center" style="width: 100%; max-width: 900px;">
+        <div class="" style="width: 100%;">
+            <!-- Ajustamos el ancho del formulario -->
+            <form  asp-action="Create" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="row d-flex flex-column align-items-center justify-content-center ">
+                    <!-- Vista previa de la imagen seleccionada -->
+
+                    <div class="d-flex justify-content-center" id="preview-container">
+                        <img id="preview" src="#" alt="Vista previa de la imagen" style="display:none;">
+                    </div>
+
+                    
+                        <!-- Estilo personalizado para el input de tipo archivo -->
+                       <div class="custom-file ">
+                            <input asp-for="ImagenFile" type="file" class="form-control-file" accept="image/*" id="imagenInput" />
+                        </div>
+                        <span asp-validation-for="ImagenFile" class="text-danger"></span>
+                   
+                </div>
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <div class="form-group">
+                    <label asp-for="Nombre" class="control-label"></label>
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                        <input asp-for="Nombre" class="form-control" />
+                    </div>
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Correo" class="control-label"></label>
+                    <div class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input asp-for="Correo" type="email" class="form-control" />
+                    </div>
+                    <span asp-validation-for="Correo" class="text-danger"></span>
+                </div>
+                <div class="form-group d-flex justify-content-between mt-3">
+                    <!-- Flexbox para los botones -->
+                    <button type="submit" class="btn text-white" style="background-color:#f97316; width:48%;"> Crear nuevo</button>
+                    <a asp-action="Index" class="btn btn-primary" style="width:48%;">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Usuarios/Create.css" />
+   
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Escuchamos el clic en el contenedor custom-file y disparamos el clic en el input de tipo file
+        document.querySelector('.custom-file').addEventListener('click', function() {
+            document.getElementById('imagenInput').click();
+        });
+
+        // Previsualizar la imagen seleccionada
+        document.getElementById("imagenInput").addEventListener("change", function(event) {
+            var file = event.target.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var previewImage = document.getElementById("preview");
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = "block"; // Muestra la imagen
+                };
+                reader.readAsDataURL(file); // Lee el archivo como una URL base64
+            }
+        });
+    </script>
+}

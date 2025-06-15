@@ -22,7 +22,7 @@ namespace ProtectorAPP.Controllers
 
         private bool SonPermisosIguales(List<PantallaConPermisosDTO> permisosTotales, List<PantallaConPermisosDTO> permisosUsuario)
         {
-            // Verificar si las listas tienen el mismo número de elementos
+            // Verificar si las listas tienen el mismo número de pantallas
             if (permisosTotales.Count != permisosUsuario.Count)
             {
                 return false;
@@ -34,7 +34,18 @@ namespace ProtectorAPP.Controllers
                 var pantallaUsuario = permisosUsuario.FirstOrDefault(p => p.IdPantalla == pantallaTotal.IdPantalla);
 
                 // Si no se encuentra la pantalla o los permisos no coinciden
-                if (pantallaUsuario == null || !pantallaUsuario.Permisos.SequenceEqual(pantallaTotal.Permisos))
+                if (pantallaUsuario == null)
+                {
+                    return false;
+                }
+
+                // Obtener solo los IdPermiso de cada lista
+                var permisosTotalesIds = pantallaTotal.Permisos.Select(p => p.IdPermiso).ToList();
+                var permisosUsuarioIds = pantallaUsuario.Permisos.Select(p => p.IdPermiso).ToList();
+
+                // Comparar las listas de IdPermiso sin importar el orden
+                if (!permisosTotalesIds.All(ptId => permisosUsuarioIds.Contains(ptId)) ||
+                    !permisosUsuarioIds.All(puId => permisosTotalesIds.Contains(puId)))
                 {
                     return false;
                 }
@@ -81,34 +92,15 @@ namespace ProtectorAPP.Controllers
 
                 if (authResponse != null)
                 {
+                    // Guardar el token JWT en la sesión
+                    HttpContext.Session.SetString("JwtToken", authResponse.Token);
+
                     var handler = new JwtSecurityTokenHandler();
                     var jwt = handler.ReadJwtToken(authResponse.Token);
 
                     var userId = jwt?.Claims?.FirstOrDefault(c => c.Type == "nameid")?.Value;
                     var userName = jwt?.Claims?.FirstOrDefault(c => c.Type == "unique_name")?.Value;
-
-                    // Crear los claims para la cookie de autenticación
-                    var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, userName),            // Nombre del usuario
-                new Claim(ClaimTypes.Email, email),              // Email del usuario
-                new Claim("UserId", userId),                     // ID del usuario
-                new Claim(ClaimTypes.Role, "User")               // Rol por defecto, puede ser cambiado a Admin
-            };
-
-                    // Crear la identidad de claims
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    // Propiedades de autenticación
-                    var authProperties = new AuthenticationProperties
-                    {
-                        IsPersistent = false,                             // Persistente (la cookie durará entre sesiones)
-                        ExpiresUtc = DateTime.UtcNow.AddMinutes(30)      // Expiración de la cookie (30 minutos)
-                    };
-
-                    // Eliminar cualquier sesión anterior y crear una nueva con cookies
-                    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+                   
 
                     // Extraer los permisos del claim 'pantallas' del token
                     var pantallasJson = jwt?.Claims?.FirstOrDefault(c => c.Type == "pantallas")?.Value;
@@ -117,6 +109,7 @@ namespace ProtectorAPP.Controllers
                                         : JsonConvert.DeserializeObject<List<PantallaConPermisosDTO>>(pantallasJson);
 
                     // Obtener los permisos totales desde el API
+             
                     var totalPermisosResponse = await httpClient.GetAsync("Permisos/TotalPermisos");
 
                     if (totalPermisosResponse.IsSuccessStatusCode)
@@ -131,12 +124,53 @@ namespace ProtectorAPP.Controllers
                         if (SonPermisosIguales(permisosTotales, permisosUsuario))
                         {
                             // Asignar el rol de admin si las listas de permisos son iguales
-                            HttpContext.Session.SetString("Role", "Admin");
+                            // Crear los claims para la cookie de autenticación
+                            var claims = new List<Claim>
+                            {
+                                new Claim(ClaimTypes.Name, userName),            // Nombre del usuario
+                                new Claim(ClaimTypes.Email, email),              // Email del usuario
+                                new Claim("UserId", userId),                     // ID del usuario
+                                new Claim(ClaimTypes.Role, "Admin")               // Rol por defecto, puede ser cambiado a Admin
+                            };
+
+                            // Crear la identidad de claims
+                            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                            // Propiedades de autenticación
+                            var authProperties = new AuthenticationProperties
+                            {
+                                IsPersistent = false,                             // Persistente (la cookie durará entre sesiones)
+                                ExpiresUtc = DateTime.UtcNow.AddMinutes(30)      // Expiración de la cookie (30 minutos)
+                            };
+
+                            // Eliminar cualquier sesión anterior y crear una nueva con cookies
+                            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
                         }
                         else
                         {
-                            // Asignar el rol de usuario si no son iguales
-                            HttpContext.Session.SetString("Role", "User");
+                            // Crear los claims para la cookie de autenticación
+                            var claims = new List<Claim>
+                            {
+                                new Claim(ClaimTypes.Name, userName),            // Nombre del usuario
+                                new Claim(ClaimTypes.Email, email),              // Email del usuario
+                                new Claim("UserId", userId),                     // ID del usuario
+                                new Claim(ClaimTypes.Role, "User")               // Rol por defecto, puede ser cambiado a Admin
+                            };
+
+                            // Crear la identidad de claims
+                            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                            // Propiedades de autenticación
+                            var authProperties = new AuthenticationProperties
+                            {
+                                IsPersistent = false,                             // Persistente (la cookie durará entre sesiones)
+                                ExpiresUtc = DateTime.UtcNow.AddMinutes(30)      // Expiración de la cookie (30 minutos)
+                            };
+
+                            // Eliminar cualquier sesión anterior y crear una nueva con cookies
+                            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
                         }
 
                         // Redirigir a la página principal

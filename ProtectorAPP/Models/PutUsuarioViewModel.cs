@@ -1,12 +1,14 @@
-﻿namespace ProtectorAPI.DTOs
+﻿using System.Text.Json.Serialization;
+
+namespace ProtectorAPP.Models
 {
-    public class UsuarioDTO
+    public class PutUsuarioViewModel
     {
         public int IdUsuario { get; set; }
         public string Nombre { get; set; }
         public string Correo { get; set; }
-        public DateTime FechaCreacion { get; set; }
         public string FotoUrl { get; set; }
-        public char Estado { get; set; }
+        [JsonIgnore] 
+        public IFormFile? ImagenFile { get; set; }
     }
 }

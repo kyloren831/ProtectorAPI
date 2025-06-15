@@ -1,0 +1,85 @@
+﻿.main-container {
+    margin-top: 100px;
+    margin-left: 250px;
+    margin-right: 250px;
+    background-color: #faecec;
+    border-radius: 1rem;
+    height: 710px;
+    padding: 0px;
+    box-shadow: 10px 10px 10px 10px;
+    position: relative;
+    overflow: auto; /* Cortar el contenido que se desborda sin activar desplazamiento */
+    scrollbar-width: none;
+    box-sizing: border-box;
+}
+    .main-container::-webkit-scrollbar {
+        display: none; /* Oculta la barra de desplazamiento */
+    }
+.tittle {
+    padding: 25px; /* Centrar la tabla */
+    max-width: 110%;
+}
+
+table {
+    width: 60%; /* Ajustar la tabla para que sea más pequeña que el contenedor */
+    max-width: 100%; /* Asegura que no se extienda más allá del contenedor */
+    table-layout: auto; /* Ajustar el tamaño de las celdas según el contenido */
+    border-collapse: collapse; /* Eliminar los espacios entre las celdas */
+    margin-left: auto; /* Centrar la tabla */
+    margin-right: auto; /* Centrar la tabla */
+    overflow: auto;
+}
+
+th, td {
+    vertical-align: middle;
+    text-align: center; /* Alineación de texto a la izquierda */
+    border-bottom: 1px solid #ddd; /* Línea debajo de cada fila */
+}
+
+
+
+thead {
+    background-color: #B0B0B0; /* Fondo gris claro para los encabezados */
+}
+
+@media screen and (max-width: 768px) {
+    .main-container {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    table {
+        width: 75%;
+    }
+
+    th, td {
+        padding: 8px 5px; /* Reducir el padding en pantallas pequeñas */
+    }
+}
+.btb-off, .btn-edit, .btn-details {
+    padding: 5px 5px;
+}
+.btn-off:hover {
+    background-color: #FFC6C6;
+    color: #BD0A0A;
+}
+.btn-edit:hover {
+    background-color: #ADF0C7;
+    color: green;
+}
+.btn-details:hover {
+    background-color: #FFF6B6;
+    color: #FFDC4A;
+}
+
+.td-activo {
+    background-color: #ADF0C7;
+    color:green;
+    border-radius:1rem;
+}
+
+.td-inactivo {
+    background-color: #FFC6C6;
+    color: #BD0A0A;
+    border-radius: 1rem;
+}

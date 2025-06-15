@@ -42,23 +42,23 @@ namespace ProtectorAPI.Services
 
             // Permisos directos filtrados por pantallas activas y sistemas activos
             var directosPorPantalla = usuario.UsuarioPermisosPantallas
-                .Where(up => up.Pantalla.Estado.Equals('A') && up.Pantalla.Sistema.Estado.Equals( 'A'))
-                .GroupBy(up => up.Pantalla)
-                .Select(g => new PantallaConPermisosDTO
+            .Where(up => up.Pantalla.Estado.ToString().Trim() == "A" && up.Pantalla.Sistema.Estado.ToString().Trim() == "A")
+            .GroupBy(up => up.Pantalla)
+            .Select(g => new PantallaConPermisosDTO
+            {
+                IdPantalla = g.Key.IdPantalla,
+                DescripcionPantalla = g.Key.Descripcion,
+                Permisos = g.Select(up => new PermisoDTO
                 {
-                    IdPantalla = g.Key.IdPantalla,
-                    DescripcionPantalla = g.Key.Descripcion,
-                    Permisos = g.Select(up => new PermisoDTO
-                    {
-                        IdPermiso = up.Permiso.IdPermiso,
-                        Descripcion = up.Permiso.Descripcion
-                    }).Distinct().ToList()
-                });
+                    IdPermiso = up.Permiso.IdPermiso,
+                    Descripcion = up.Permiso.Descripcion
+                }).Distinct().ToList()
+            });
 
             // Permisos por roles filtrados por pantallas activas y sistemas activos
             var permisosPorRoles = usuario.UsuarioRoles
                 .SelectMany(ur => ur.Rol.RolPermisosPantallas)
-                .Where(rp => rp.Pantalla.Estado == 'A' && rp.Pantalla.Sistema.Estado.Equals('A'))
+                .Where(rp => rp.Pantalla.Estado.ToString().Trim() == "A" && rp.Pantalla.Sistema.Estado.ToString().Trim() == "A")
                 .GroupBy(rp => rp.Pantalla)
                 .Select(g => new PantallaConPermisosDTO
                 {
@@ -93,7 +93,7 @@ namespace ProtectorAPI.Services
         {
             // Traer las pantallas activas y sus relaciones
             var pantallas = await context.Pantallas
-                .Where(p => p.Estado.Equals('A') && p.Sistema.Estado.Equals('A'))
+                .Where(p => p.Estado.ToString().Trim() == "A" && p.Sistema.Estado.ToString().Trim() == "A")
                 .Include(p => p.RolPermisosPantallas)
                     .ThenInclude(rp => rp.Permiso)
                 .Include(p => p.UsuarioPermisosPantallas)
@@ -103,23 +103,25 @@ namespace ProtectorAPI.Services
 
             var resultado = pantallas.Select(p => new PantallaConPermisosDTO
             {
+
                 IdPantalla = p.IdPantalla,
                 DescripcionPantalla = p.Descripcion,
                 Permisos = p.RolPermisosPantallas
-                                .Select(rp => new PermisoDTO
-                                {
-                                    IdPermiso = rp.Permiso.IdPermiso,
-                                    Descripcion = rp.Permiso.Descripcion
-                                })
-                                .Concat(
-                                    p.UsuarioPermisosPantallas.Select(up => new PermisoDTO
-                                    {
-                                        IdPermiso = up.Permiso.IdPermiso,
-                                        Descripcion = up.Permiso.Descripcion
-                                    })
-                                )
-                                .Distinct() // eliminar duplicados
-                                .ToList()
+                        .Select(rp => new PermisoDTO
+                        {
+                            IdPermiso = rp.Permiso.IdPermiso,
+                            Descripcion = rp.Permiso.Descripcion
+                        })
+                        .Concat(
+                            p.UsuarioPermisosPantallas.Select(up => new PermisoDTO
+                            {
+                                IdPermiso = up.Permiso.IdPermiso,
+                                Descripcion = up.Permiso.Descripcion
+                            })
+                        )
+                        .GroupBy(p => new { p.IdPermiso, p.Descripcion }) // Agrupar por IdPermiso y Descripcion
+                        .Select(g => g.First()) // Tomar el primer permiso en cada grupo
+                        .ToList()
             }).ToList();
 
             return resultado;

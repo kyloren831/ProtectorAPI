@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using ProtectorAPI.Data;
 using ProtectorAPI.DTOs;
 using ProtectorAPI.Models;
 using ProtectorAPI.Services;
+using IAuthorizationService = ProtectorAPI.Services.IAuthorizationService;
 using LoginRequest = ProtectorAPI.DTOs.LoginRequest;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -41,7 +43,6 @@ namespace ProtectorAPI.Controllers
                         IdUsuario = usuario.IdUsuario,
                         Nombre = usuario.Nombre,
                         Correo = usuario.Correo,
-                        Contrasenna = usuario.Contrasenna,
                         FechaCreacion = usuario.FechaCreacion,
                         FotoUrl = usuario.FotoUrl,
                         Estado = usuario.Estado
@@ -68,7 +69,6 @@ namespace ProtectorAPI.Controllers
                     IdUsuario = usuario.IdUsuario,
                     Nombre = usuario.Nombre,
                     Correo = usuario.Correo,
-                    Contrasenna = usuario.Contrasenna,
                     FechaCreacion = usuario.FechaCreacion,
                     FotoUrl = usuario.FotoUrl,
                     Estado = usuario.Estado
@@ -83,8 +83,10 @@ namespace ProtectorAPI.Controllers
 
         // POST api/<UsuariosController>
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] UsuarioDTO usuario)
+        [Authorize]
+        public async Task<ActionResult> Post([FromBody] PostUsuarioDTO usuario)
         {
+            
             //Se abre una trasaccion
             using (var transaccion = context.Database.BeginTransaction())
             {
@@ -92,13 +94,13 @@ namespace ProtectorAPI.Controllers
                 {
                     Usuario temp = new Usuario
                     {
-                        IdUsuario = usuario.IdUsuario,
+                        IdUsuario = 0,
                         Nombre = usuario.Nombre,
                         Correo = usuario.Correo,
-                        Contrasenna = usuario.Contrasenna,
-                        FechaCreacion = usuario.FechaCreacion,
+                        Contrasenna = "",
+                        FechaCreacion = DateTime.Now,
                         FotoUrl = usuario.FotoUrl,
-                        Estado = usuario.Estado
+                        Estado = char.Parse("A")
                     };
 
                     var contrasenna = PasswordGenerator.Generar(10);
@@ -139,6 +141,7 @@ namespace ProtectorAPI.Controllers
 
         // PUT api/<UsuariosController>/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<ActionResult<Usuario>> Put(int id, [FromBody] PutUsuarioDTO usuario)
         {
             if (id != usuario.IdUsuario) //Si el id que del URL != id del body return bad request
@@ -158,9 +161,7 @@ namespace ProtectorAPI.Controllers
 
                     temp.Nombre = usuario.Nombre;
                     temp.Correo = usuario.Correo;
-                    temp.FechaCreacion = usuario.FechaCreacion;
                     temp.FotoUrl = usuario.FotoUrl;
-                    temp.Estado = usuario.Estado;
 
 
                     // se inserta el usuario y se guardan los cambios
@@ -184,6 +185,7 @@ namespace ProtectorAPI.Controllers
 
         // Patch api/<UsuariosController>/5
         [HttpPatch("{id}")]
+        [Authorize]
         public async Task<ActionResult> CambiarEstado(int id)
         {
             using (var transaccion = context.Database.BeginTransaction())
@@ -193,7 +195,7 @@ namespace ProtectorAPI.Controllers
                     var temp = await context.Usuarios.FindAsync(id);
                     if (temp == null) return NotFound();
 
-                    if (temp.Estado.Equals("A"))
+                    if (temp.Estado.ToString().Equals("A"))
                     {
                         temp.Estado = char.Parse("B");
                     }
@@ -208,12 +210,12 @@ namespace ProtectorAPI.Controllers
                     // Confirma la transacción
                     await transaccion.CommitAsync();
 
-                    return Ok(temp);
+                    return Ok("Estado cambiado exitosamente.");
                 }
                 catch (Exception ex)
                 {
                     await transaccion.RollbackAsync();
-                    return BadRequest(ex.Message);
+                    return BadRequest($"Error al cambiar el estado: {ex.Message}");
                 }
             }
         }

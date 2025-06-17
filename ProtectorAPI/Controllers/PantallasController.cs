@@ -19,20 +19,7 @@ namespace ProtectorAPI.Controllers
             this.context = context;
         }
 
-        // GET: api/<PantallasController>
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pantalla>>> Get()
-        {
-            try
-            {
-                IEnumerable<Pantalla> pantallas = await context.Pantallas.ToListAsync();
-                return Ok(pantallas);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+       
 
         // GET api/<PantallasController>/5
         [HttpGet("{id}")]

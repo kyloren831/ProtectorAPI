@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ProtectorAPI.Models
 {
@@ -22,8 +23,11 @@ namespace ProtectorAPI.Models
 
         [Column("ESTADO")]
         public char Estado { get; set; }
+        [JsonIgnore]
         public Sistema Sistema { get; set; }
+        [JsonIgnore]
         public List<RolPermisoPantalla> RolPermisosPantallas { get; set; }
+        [JsonIgnore]
         public List<UsuarioPermisoPantalla> UsuarioPermisosPantallas { get; set; }
 
 

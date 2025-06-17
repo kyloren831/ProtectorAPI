@@ -15,6 +15,7 @@ namespace ProtectorAPP.Controllers
 
         public IActionResult Index()
         {
+            
             if (!User.Identity.IsAuthenticated)
             {
                 // Si no hay token, redirige al login

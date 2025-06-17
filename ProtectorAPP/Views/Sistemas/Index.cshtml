@@ -1,0 +1,178 @@
+﻿@model IEnumerable<ProtectorAPP.Models.SistemasViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="main-container">
+
+    <div class="row bg-primary tittle d-flex justify-content-between">
+        <div class="col text-white">
+            <h1>Gestión de Sistemas</h1>
+        </div>
+        <div class="col">
+        </div>
+        <div class="col-auto py-2">
+            <a asp-action="Create" asp-controller="Sistemas" class="btn text-white" style="background-color:#f97316">
+                <i class="fas fa-plus"></i> Agregar nuevo
+            </a>
+        </div>
+    </div>
+
+    @* Mostrar mensaje de éxito si existe *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* Mostrar mensaje de error si existe *@
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Descripción
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Url)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Estado)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                            <div>
+                                @Html.DisplayFor(modelItem => item.Descripcion)
+                            </div>
+                        
+                    </td>
+
+                    <td>
+                        <div>
+                            @Html.DisplayFor(modelItem => item.Url)
+                        </div>
+                    </td>
+
+                    <td>
+                        @if (item.Estado.ToString().Equals("A"))
+                        {
+                            <div class="td-activo d-flex justify-content-center"> Activo </div>
+                        }
+                        else
+                        {
+                            <div class="td-inactivo d-flex justify-content-center"> Inactivo </div>
+                        }
+                    </td>
+
+                    <td>
+                        <a type="button" class="btn btn-details" asp-controller="Pantallas" asp-action="Index" asp-route-id="@item.IdSistema">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a type="button" class="btn btn-edit" asp-controller="Sistemas" asp-action="Edit" asp-route-id="@item.IdSistema">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        @{
+                            string IDModal = "L" + item.IdSistema;
+                        }
+
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-off" data-bs-toggle="modal" data-bs-target="#@IDModal">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="@IDModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Confirmar acción</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ¿Desea cambiar el estado de @item.Descripcion?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+
+                                        <!-- Formulario para cambiar estado -->
+                                        <form asp-controller="Sistemas" asp-action="CambiarEstado" method="post" asp-route-id="@item.IdSistema">
+                                            <button type="submit" class="btn btn-primary">Guardar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Sistemas/Index.css" />
+}
+
+@section Scripts {
+    <script>
+        let systemId = null;
+
+        // Función para abrir el modal y almacenar el ID del sistema
+        function abrirModalCambioEstado(id, descripcion) {
+            systemId = id;
+            systemDescription = descripcion;
+            // Mostrar el modal
+            document.getElementById('mensajeModal').textContent = `¿Estás seguro de que deseas cambiar el estado de ${systemDescription}?`;
+            $('#modalCambioEstado').modal('show');
+        }
+        function cerrarModal(id) {
+            systemId = 0;
+            // Mostrar el modal
+            $('#modalCambioEstado').modal('hide');
+        }
+
+        // Función para hacer la solicitud PATCH y cambiar el estado del sistema
+        async function cambiarEstadoSistema() {
+            try {
+                const response = await fetch(`/Sistemas/CambiarEstado?id=${systemId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('mensajeModal').textContent = data.message;
+                    setTimeout(() => {
+                        $('#modalCambioEstado').modal('hide');
+                        location.reload();
+                    }, 1500);
+                } else {
+                    document.getElementById('mensajeModal').textContent = data.message;
+                }
+            } catch (error) {
+                document.getElementById('mensajeModal').textContent = 'Hubo un problema al realizar la solicitud.';
+            }
+        }
+    </script>
+}

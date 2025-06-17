@@ -59,11 +59,6 @@ namespace ProtectorAPP.Controllers
         [HttpGet]
         public ActionResult Login()
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                // Si está autenticado, redirigir al home o alguna página principal
-                return RedirectToAction("Index", "Home");
-            }
 
             return View();
         }

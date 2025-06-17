@@ -1,0 +1,88 @@
+﻿@model ProtectorAPP.Models.SistemasViewModel;
+@{
+}
+
+@{
+    ViewData["Title"] = "Edit";
+}
+<div class="main-container d-flex justify-content-center">
+
+    <div class="d-flex align-items-center justify-content-center" style="width: 100%; max-width: 900px;">
+        <div class="" style="width: 100%;">
+            <h1>Editar Sistema</h1>
+            <!-- Ajustamos el ancho del formulario -->
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <div class="form-group">
+                    <label asp-for="IdSistema" class="control-label"></label>
+                    <div class="input-icon">
+                        <i class="fas fa-barcode"></i>
+                        <input asp-for="IdSistema" readonly class="form-control" />
+                    </div>
+                    <span asp-validation-for="IdSistema" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Descripcion" class="control-label"></label>
+                    <div class="input-icon">
+                        <i class="fas fa-info"></i>
+                        <input asp-for="Descripcion" type="text" class="form-control" />
+                    </div>
+                    <span asp-validation-for="Descripcion" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Url" class="control-label"></label>
+                    <div class="input-icon">
+                        <i class="fas fa-link"></i>
+                        <input asp-for="Url" type="text" class="form-control" />
+                    </div>
+                    <span asp-validation-for="Url" class="text-danger"></span>
+                </div>
+
+
+                <div class="form-group">
+                    <label asp-for="Estado" class="control-label"></label>
+                    <div class="input-icon">
+
+                        <!-- Select para "Activo" o "Inactivo" -->
+                        <select asp-for="Estado" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                            <option value="A">Activo</option>
+                            <option value="B">Inactivo</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="Estado" class="text-danger"></span>
+                </div>
+
+
+
+                <div class="form-group d-flex justify-content-between mt-3">
+                    <!-- Flexbox para los botones -->
+                    <button type="submit" class="btn text-white" style="background-color:#f97316; width:48%;"> Actualizar</button>
+                    <a asp-action="Index" class="btn btn-primary" style="width:48%;">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Usuarios/Create.css" />
+
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+
+}

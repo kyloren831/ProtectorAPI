@@ -1,0 +1,47 @@
+﻿@model SistemaConPantallasViewModel;
+@{
+	ViewData["Title"] = "Index";
+}
+<div class="main-container">
+	<div class="row text-center pt-5">
+		<h1>@Model.Descripcion</h1>
+	</div>
+	<div class="row card-container d-flex flex-wrap justify-content-center">
+		@foreach (var item in Model.Pantallas)
+		{
+			<div class="col card" style="width: 18rem; max-width:25%">
+				<img src="@Url.Content(item.FotoUrl)" class="card-img-top" alt="Imagen de la pantalla">
+				<div class="card-body">
+					<h5 class="card-title">@item.Descripcion</h5>
+					<p class="card-text">
+						@if(item.Estado.ToString() == "A")
+						{
+							<span class="badge-activo">Activo</span>
+						}
+						else
+						{
+							<span class="badge-inactivo">Inactivo</span>
+						}
+
+					</p>
+					<div class="row d-flex justify-content-between px-1">
+						<a href="#" class="btn btn-primary" style="max-width:40%">Editar</a>
+						<a href="#" class="btn btn-danger" style="max-width:40%">Eliminar</a>
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+	<div class="row align-content-end">
+		<div class="col-auto py-2 ">
+			<a asp-action="Create" asp-controller="Pantallas" class="btn text-white" style="background-color:#f97316">
+				<i class="fas fa-plus"></i> Agregar nuevo
+			</a>
+		</div>
+	</div>
+</div>
+
+
+@section Styles {
+	<link rel="stylesheet" href="~/css/Pantallas/Index.css" />
+}

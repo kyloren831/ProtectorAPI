@@ -1,0 +1,51 @@
+﻿.main-container {
+    margin-top: 100px;
+    margin-left: 250px;
+    margin-right: 250px;
+    background-color: #faecec;
+    border-radius: 1rem;
+    height: 710px;
+    padding: 0px;
+    box-shadow: 10px 10px 10px 10px;
+    position: relative;
+    overflow: auto; /* Cortar el contenido que se desborda sin activar desplazamiento */
+    scrollbar-width: none;
+    box-sizing: border-box;
+}
+
+    .main-container::-webkit-scrollbar {
+        display: none; /* Oculta la barra de desplazamiento */
+    }
+
+
+.badge-activo {
+    background-color: #ADF0C7; /* verde claro */
+    color: green; /* verde oscuro */
+    font-weight: 500;
+    border-radius: 12px;
+    padding: 0.15em 0.6em;
+    font-size: 0.75rem;
+    display: inline-block;
+    margin-right: 0.5rem;
+    user-select: none;
+}
+.badge-inactivo {
+    background-color: #FFC6C6; /* verde claro */
+    color: #BD0A0A; /* verde oscuro */
+    font-weight: 500;
+    border-radius: 12px;
+    padding: 0.15em 0.6em;
+    font-size: 0.75rem;
+    display: inline-block;
+    margin-right: 0.5rem;
+    user-select: none;
+}
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    margin: 10px; /* Espacio entre las tarjetas */
+}

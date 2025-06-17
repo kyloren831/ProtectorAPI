@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-using ProtectorAPI.Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProtectorAPI.Data;
 using ProtectorAPI.DTOs;
-using Microsoft.EntityFrameworkCore;
+using ProtectorAPI.Models;
 
 namespace ProtectorAPI.Controllers
 {
@@ -24,9 +26,67 @@ namespace ProtectorAPI.Controllers
 
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Patch api/<UsuariosController>/5
+        [HttpPatch("{id}")]
+        [Authorize]
+        public async Task<ActionResult> CambiarEstado(int id)
+        {
+            using (var transaccion = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var temp = await context.Sistemas.FindAsync(id);
+                    if (temp == null) return NotFound();
+
+                    if (temp.Estado.ToString().Equals("A"))
+                    {
+                        temp.Estado = "B";
+                    }
+                    else
+                    {
+                        temp.Estado = "A";
+                    }
+
+                    context.Sistemas.Update(temp);
+                    await context.SaveChangesAsync();
+
+                    // Confirma la transacción
+                    await transaccion.CommitAsync();
+
+                    return Ok("Estado cambiado exitosamente.");
+                }
+                catch (Exception ex)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest($"Error al cambiar el estado: {ex.Message}");
+                }
+            }
+        }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        [HttpGet("Listar/ConPantallas")]
+        [Authorize]
+        public async Task<ActionResult<Sistema>> GetConPantallas([FromQuery] int id)
+        {
+            try
+            {
+                var sistema = await context.Sistemas.Include(x => x.Pantallas).FirstOrDefaultAsync(x=> x.IdSistema == id);
+                if(sistema == null) return NotFound();
+
+                return Ok(sistema);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [HttpGet("Listar")]
+        [Authorize]
         public async Task<ActionResult<List<SistemaDTO>>> Get()
         {
             try
@@ -57,6 +117,7 @@ namespace ProtectorAPI.Controllers
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [HttpPost("Guardar")]
+        [Authorize]
         public async Task<ActionResult> Post([FromBody] SistemaDTO sistema)
         {
             using (var transaccion = context.Database.BeginTransaction())
@@ -90,6 +151,7 @@ namespace ProtectorAPI.Controllers
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         [HttpGet("Buscar")]
+        [Authorize]
         public async Task<ActionResult<SistemaDTO>> Get(int id)
         {
             try
@@ -114,6 +176,7 @@ namespace ProtectorAPI.Controllers
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [HttpPut("Actualizar")]
+        [Authorize]
         public async Task<ActionResult<Sistema>> Put(int id, [FromBody] SistemaDTO sistema)
         {
             if (id != sistema.IdSistema)

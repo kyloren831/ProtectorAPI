@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
-namespace ProtectorAPP.Models
+namespace ProtectorAPP.Models.Usuarios
 {
     public class PostUsuario
     {

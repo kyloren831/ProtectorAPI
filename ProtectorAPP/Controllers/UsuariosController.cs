@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using ProtectorAPP.Models;
 using System.Text;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using NuGet.Common;
+using ProtectorAPP.Models.Usuarios;
 
 namespace ProtectorAPP.Controllers
 {

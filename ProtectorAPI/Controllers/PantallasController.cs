@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProtectorAPI.Data;
 using ProtectorAPI.DTOs;
@@ -23,6 +24,7 @@ namespace ProtectorAPI.Controllers
 
         // GET api/<PantallasController>/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<Pantalla>> Get(int id)
         {
             try
@@ -39,6 +41,8 @@ namespace ProtectorAPI.Controllers
 
         // POST api/<PantallasController>
         [HttpPost]
+
+        [Authorize]
         public async Task<ActionResult<Pantalla>> Post([FromBody] PantallaDTO dto)
         {
             using (var transaccion = context.Database.BeginTransaction())
@@ -72,11 +76,85 @@ namespace ProtectorAPI.Controllers
                 }
             }
         }
+        // Patch api/<UsuariosController>/5
+        [HttpPatch("{id}")]
+        [Authorize]
+        public async Task<ActionResult> CambiarEstado(int id)
+        {
+            using (var transaccion = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var temp = await context.Pantallas.FindAsync(id);
+                    if (temp == null) return NotFound();
+
+                    if (temp.Estado.ToString().Equals("A"))
+                    {
+                        temp.Estado = char.Parse("B");
+                    }
+                    else
+                    {
+                        temp.Estado = char.Parse("A");
+                    }
+
+                    context.Pantallas.Update(temp);
+                    await context.SaveChangesAsync();
+
+                    // Confirma la transacción
+                    await transaccion.CommitAsync();
+
+                    return Ok(temp);
+                }
+                catch (Exception ex)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest($"Error al cambiar el estado: {ex.Message}");
+                }
+            }
+        }
 
         // PUT api/<PantallasController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [Authorize]
+        public async Task<ActionResult> Put(int id, [FromBody] PantallaDTO dto)
         {
+            if(id != dto.IdPantalla)
+            {
+                return BadRequest("Datos invalidos...");
+            }
+            //Se abre una trasaccion
+            using (var transaccion = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var temp = await context.Pantallas.FindAsync(id);
+
+                    // Si no se encuentra el usuario, retorna NotFound
+                    if (temp == null)
+                        return NotFound();
+
+                    temp.Descripcion = dto.Descripcion;
+                    temp.Estado = dto.Estado;
+                    temp.FotoUrl = dto.FotoUrl;
+
+
+                    // se inserta el usuario y se guardan los cambios
+                    context.Pantallas.Update(temp);
+                    await context.SaveChangesAsync();
+
+                    // Confirma la transacción
+                    await transaccion.CommitAsync();
+
+                    return Ok(temp);
+
+                }
+                catch (Exception ex)
+                {
+                    // deshace la transacción si ocurre un error 
+                    await transaccion.RollbackAsync();
+                    return BadRequest(ex.Message);
+                }
+            }
         }
 
         // DELETE api/<PantallasController>/5

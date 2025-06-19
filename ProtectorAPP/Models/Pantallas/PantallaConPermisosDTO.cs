@@ -1,4 +1,4 @@
-﻿namespace ProtectorAPP.Models
+﻿namespace ProtectorAPP.Models.Pantallas
 {
     public class PantallaConPermisosDTO
     {

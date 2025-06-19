@@ -1,47 +1,102 @@
-﻿@model SistemaConPantallasViewModel;
+﻿@model ProtectorAPP.Models.Pantallas.SistemaConPantallasViewModel;
 @{
 	ViewData["Title"] = "Index";
 }
-<div class="main-container">
-	<div class="row text-center pt-5">
-		<h1>@Model.Descripcion</h1>
-	</div>
-	<div class="row card-container d-flex flex-wrap justify-content-center">
-		@foreach (var item in Model.Pantallas)
-		{
-			<div class="col card" style="width: 18rem; max-width:25%">
-				<img src="@Url.Content(item.FotoUrl)" class="card-img-top" alt="Imagen de la pantalla">
-				<div class="card-body">
-					<h5 class="card-title">@item.Descripcion</h5>
-					<p class="card-text">
-						@if(item.Estado.ToString() == "A")
-						{
-							<span class="badge-activo">Activo</span>
-						}
-						else
-						{
-							<span class="badge-inactivo">Inactivo</span>
-						}
+<div class="main-container container">
+    <div class="row text-center pt-5">
+        <h1>@Model.Descripcion</h1>
+    </div>
+    <div class="row  d-flex justify-content-center">
+        
+            @foreach (var item in Model.Pantallas)
+            {
+            <div class="col-md-6 col-lg-4">
+                <div class="card">
+                    <img src="@Url.Content(item.FotoUrl)" class="card-img-top" alt="Imagen de la pantalla">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Descripcion</h5>
+                        <p class="card-text">
+                            @if (item.Estado.ToString() == "A")
+                            {
+                                <span class="badge-activo">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge-inactivo">Inactivo</span>
+                            }
+                        </p>
+                        <div class="row d-flex justify-content-between px-1">
+                            <a asp-action="Edit" asp-controller="Pantallas" asp-route-id="@item.IdPantalla" class="btn btn-primary" style="max-width:40%">Editar</a>
+                            @{
+                                string IDModal = "L" + item.IdPantalla;
+                            }
 
-					</p>
-					<div class="row d-flex justify-content-between px-1">
-						<a href="#" class="btn btn-primary" style="max-width:40%">Editar</a>
-						<a href="#" class="btn btn-danger" style="max-width:40%">Eliminar</a>
-					</div>
-				</div>
-			</div>
-		}
-	</div>
-	<div class="row align-content-end">
-		<div class="col-auto py-2 ">
-			<a asp-action="Create" asp-controller="Pantallas" class="btn text-white" style="background-color:#f97316">
-				<i class="fas fa-plus"></i> Agregar nuevo
-			</a>
-		</div>
-	</div>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#@IDModal" style="max-width:40%">
+                                <i class="fas fa-power-off"></i> Estado
+                            </button>
+                            <!-- Modal -->
+                            <div class="modal fade" id="@IDModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Confirmar acción</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ¿Desea cambiar el estado de @item.Descripcion?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+
+                                            <!-- Formulario para cambiar estado -->
+                                            <form asp-controller="Pantallas" asp-action="CambiarEstado" method="post" asp-route-id="@item.IdPantalla">
+                                                <button type="submit" class="btn btn-primary">Guardar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+       
+    </div>
+
+    <div class="row d-flex justify-content-end mt-auto mx-5">
+        <div class="col-auto py-2">
+            <a asp-action="Create" asp-controller="Pantallas" asp-route-id="@Model.IdSistema" class="btn-add btn text-white">
+                <i class="fas fa-plus"></i> Agregar nuevo
+            </a>
+        </div>
+    </div>
 </div>
+
 
 
 @section Styles {
 	<link rel="stylesheet" href="~/css/Pantallas/Index.css" />
+}
+
+@section Scripts{
+    <script>
+        let pantallaId = null;
+
+        // Función para abrir el modal y almacenar el ID del usuario
+        function abrirModalCambioEstado(id, nombre) {
+            pantallaId = id;
+            userName= nombre;
+            // Mostrar el modal
+            document.getElementById('mensajeModal').textContent = `¿Estás seguro de que deseas cambiar el estado de ${userName}?`;
+            $('#modalCambioEstado').modal('show');
+        }
+        function cerrarModal(id) {
+            pantallaId = 0;
+            // Mostrar el modal
+            $('#modalCambioEstado').modal('hide');
+        }
+      
+    </script>
 }

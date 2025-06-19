@@ -121,10 +121,12 @@ namespace ProtectorAPI.Services
                         )
                         .GroupBy(p => new { p.IdPermiso, p.Descripcion }) // Agrupar por IdPermiso y Descripcion
                         .Select(g => g.First()) // Tomar el primer permiso en cada grupo
-                        .ToList()
+                        .ToList() 
             }).ToList();
 
-            return resultado;
+            var real = resultado.Where(x => x.Permisos.Count > 0).ToList();
+
+            return real;
         }
 
 

@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using ProtectorAPP.Models;
+using ProtectorAPP.Models.Pantallas;
+using ProtectorAPP.Models.Usuarios;
 
 namespace ProtectorAPP.Controllers
 {

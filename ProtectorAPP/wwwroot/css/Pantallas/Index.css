@@ -17,7 +17,6 @@
         display: none; /* Oculta la barra de desplazamiento */
     }
 
-
 .badge-activo {
     background-color: #ADF0C7; /* verde claro */
     color: green; /* verde oscuro */
@@ -29,6 +28,7 @@
     margin-right: 0.5rem;
     user-select: none;
 }
+
 .badge-inactivo {
     background-color: #FFC6C6; /* verde claro */
     color: #BD0A0A; /* verde oscuro */
@@ -40,12 +40,18 @@
     margin-right: 0.5rem;
     user-select: none;
 }
-.card-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
+
+
 
 .card {
-    margin: 10px; /* Espacio entre las tarjetas */
+    width: 25rem;
+    margin-bottom: 10px;
+}
+
+
+
+
+.btn-add {
+    background-color: #f97316;
+    color: white;
 }

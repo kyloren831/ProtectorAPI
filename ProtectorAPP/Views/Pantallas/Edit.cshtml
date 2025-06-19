@@ -1,23 +1,20 @@
-﻿@model ProtectorAPP.Models.Usuarios.PutUsuarioViewModel;
+﻿@model ProtectorAPP.Models.Pantallas.PutPantallaViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Crear Pantalla - " + Model.NombreSistema;
 }
 <div class="main-container d-flex justify-content-center">
-
+    <h1>@Model.NombreSistema</h1>
     <div class="d-flex align-items-center justify-content-center" style="width: 100%; max-width: 900px;">
         <div class="" style="width: 100%;">
-
-            <!-- Cambiar el nombre de asp-action a "Edit" -->
-            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <!-- Ajustamos el ancho del formulario -->
+            <form asp-action="Edit" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="IdUsuario"/>
-
-                <input type="hidden" asp-for="FotoUrl" />
-                <div class="row d-flex flex-column align-items-center justify-content-center">
+                <div class="row d-flex flex-column align-items-center justify-content-center ">
+                    <input asp-for="IdSistema" value="@Model.IdSistema" hidden />
                     <!-- Vista previa de la imagen seleccionada -->
                     <div class="d-flex justify-content-center" id="preview-container">
-                        <img id="preview" src="@Url.Content(Model.FotoUrl)" alt="Vista previa de la imagen" style="display:block;">
+                        <img id="preview" src="@Url.Content(Model.FotoUrl)" alt="Vista previa de la imagen" style="display:none;">
                     </div>
 
                     <!-- Estilo personalizado para el input de tipo archivo -->
@@ -25,6 +22,38 @@
                         <input asp-for="ImagenFile" type="file" class="form-control-file" accept="image/*" id="imagenInput" />
                     </div>
                     <span asp-validation-for="ImagenFile" class="text-danger"></span>
+
+                    <div class="form-group">
+                        <label asp-for="Descripcion" class="control-label"></label>
+                        <div class="input-icon">
+                            <i class="fas fa-pencil-alt"></i>
+                            <input asp-for="Descripcion" class="form-control" />
+                        </div>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+
+                    <!-- Campo para el ID de la Pantalla -->
+                    <div class="form-group">
+                        <label asp-for="IdPantalla" class="control-label">ID de la Pantalla</label>
+                        <div class="input-icon">
+                            <i class="fas fa-id-badge"></i>
+                            <input asp-for="IdPantalla" class="form-control" />
+                        </div>
+                        <span asp-validation-for="IdPantalla" class="text-danger"></span>
+                    </div>
+
+                    <!-- Dropdown para el Estado de la Pantalla -->
+                    <div class="form-group">
+                        <label asp-for="Estado" class="control-label">Estado</label>
+                        <div class="input-icon">
+                            <select asp-for="Estado" class="form-control">
+                                <option value="A">Activo</option>
+                                <option value="B">Inactivo</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="Estado" class="text-danger"></span>
+                    </div>
+
                 </div>
 
                 @if (TempData["ErrorMessage"] != null)
@@ -35,31 +64,15 @@
                     </div>
                 }
 
-                <div class="form-group">
-                    <label asp-for="Nombre" class="control-label"></label>
-                    <div class="input-icon">
-                        <i class="fas fa-user"></i>
-                        <input asp-for="Nombre" class="form-control" />
-                    </div>
-                    <span asp-validation-for="Nombre" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="Correo" class="control-label"></label>
-                    <div class="input-icon">
-                        <i class="fas fa-envelope"></i>
-                        <input asp-for="Correo" type="email" class="form-control" />
-                    </div>
-                    <span asp-validation-for="Correo" class="text-danger"></span>
-                </div>
-
                 <div class="form-group d-flex justify-content-between mt-3">
-                    <button type="submit" class="btn text-white" style="background-color:#f97316; width:48%;">Actualizar</button>
+                    <!-- Flexbox para los botones -->
+                    <button type="submit" class="btn text-white" style="background-color:#f97316; width:48%;"> Editar Pantalla</button>
                     <a asp-action="Index" class="btn btn-primary" style="width:48%;">Cancelar</a>
                 </div>
             </form>
         </div>
     </div>
+
 </div>
 
 @section Styles {

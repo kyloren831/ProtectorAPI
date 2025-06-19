@@ -1,4 +1,4 @@
-﻿namespace ProtectorAPP.Models
+﻿namespace ProtectorAPP.Models.Usuarios
 {
     public class AutorizacionResponse
     {

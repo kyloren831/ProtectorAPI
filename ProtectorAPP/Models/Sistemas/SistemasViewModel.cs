@@ -1,4 +1,4 @@
-﻿namespace ProtectorAPP.Models
+﻿namespace ProtectorAPP.Models.Sistemas
 {
     public class SistemasViewModel
     {

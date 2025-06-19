@@ -253,7 +253,7 @@ namespace ProtectorAPP.Controllers
 
                         if (pantalla != null)
                         {
-                            var responseSys = await httpClient.GetAsync($"Sistemas/Buscar?id={id}");
+                            var responseSys = await httpClient.GetAsync($"Sistemas/Buscar?id={pantalla.IdSistema}");
                             if (responseSys.IsSuccessStatusCode)
                             {
                                 var jsonSys = await response.Content.ReadAsStringAsync();

@@ -1,11 +1,12 @@
 ﻿@model ProtectorAPP.Models.Pantallas.PutPantallaViewModel
 
 @{
-    ViewData["Title"] = "Crear Pantalla - " + Model.NombreSistema;
+    ViewData["Title"] = "Editar Pantalla - " + Model.NombreSistema;
 }
-<div class="main-container d-flex justify-content-center">
-    <h1>@Model.NombreSistema</h1>
+<div class="main-container container d-flex justify-content-center">
+   
     <div class="d-flex align-items-center justify-content-center" style="width: 100%; max-width: 900px;">
+       
         <div class="" style="width: 100%;">
             <!-- Ajustamos el ancho del formulario -->
             <form asp-action="Edit" enctype="multipart/form-data">
@@ -34,10 +35,9 @@
 
                     <!-- Campo para el ID de la Pantalla -->
                     <div class="form-group">
-                        <label asp-for="IdPantalla" class="control-label">ID de la Pantalla</label>
+                        <label asp-for="IdPantalla" hidden class="control-label">ID de la Pantalla</label>
                         <div class="input-icon">
-                            <i class="fas fa-id-badge"></i>
-                            <input asp-for="IdPantalla" class="form-control" />
+                            <input asp-for="IdPantalla" hidden class="form-control" />
                         </div>
                         <span asp-validation-for="IdPantalla" class="text-danger"></span>
                     </div>
@@ -67,7 +67,7 @@
                 <div class="form-group d-flex justify-content-between mt-3">
                     <!-- Flexbox para los botones -->
                     <button type="submit" class="btn text-white" style="background-color:#f97316; width:48%;"> Editar Pantalla</button>
-                    <a asp-action="Index" class="btn btn-primary" style="width:48%;">Cancelar</a>
+                    <a asp-action="Index" asp-route-id="@Model.IdSistema" class="btn btn-primary" style="width:48%;">Cancelar</a>
                 </div>
             </form>
         </div>

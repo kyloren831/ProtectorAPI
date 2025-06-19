@@ -5,7 +5,6 @@
     ViewData["Title"] = "Crear Pantalla - " + Model.NombreSistema;
 }
 <div class="main-container d-flex justify-content-center">
-    <h1>@Model.NombreSistema</h1>
     <div class="d-flex align-items-center justify-content-center" style="width: 100%; max-width: 900px;">
         <div class="" style="width: 100%;">
             <!-- Ajustamos el ancho del formulario -->
@@ -68,7 +67,7 @@
                 <div class="form-group d-flex justify-content-between mt-3">
                     <!-- Flexbox para los botones -->
                     <button type="submit" class="btn text-white" style="background-color:#f97316; width:48%;"> Crear Pantalla</button>
-                    <a asp-action="Index" class="btn btn-primary" style="width:48%;">Cancelar</a>
+                    <a asp-action="Index" asp-route-id="@Model.IdSistema" class="btn btn-primary" style="width:48%;">Cancelar</a>
                 </div>
             </form>
         </div>

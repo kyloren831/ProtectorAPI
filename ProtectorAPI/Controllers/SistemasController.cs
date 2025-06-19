@@ -156,7 +156,7 @@ namespace ProtectorAPI.Controllers
         {
             try
             {
-                var sistema = await context.Sistemas.FindAsync(id);
+                var sistema = await context.Sistemas.FirstOrDefaultAsync(x=>x.IdSistema ==id);
                 SistemaDTO temp = new SistemaDTO
                 {
                     IdSistema = sistema.IdSistema,

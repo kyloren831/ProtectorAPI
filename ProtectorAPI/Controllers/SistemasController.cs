@@ -82,8 +82,24 @@ namespace ProtectorAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("Listar/TodasConPantallas")]
+        [Authorize]
+        public async Task<ActionResult<Sistema>> GetConPantallas()
+        {
+            try
+            {
+                var sistema = await context.Sistemas.Include(x => x.Pantallas).ToListAsync();
+                if (sistema == null) return NotFound();
+                return Ok(sistema);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [HttpGet("Listar")]
         [Authorize]

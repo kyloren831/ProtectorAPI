@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ProtectorAPI.Models
 {
@@ -16,9 +17,11 @@ namespace ProtectorAPI.Models
 
         [Column("IDPANTALLA")]
         public int IdPantalla { get; set; }
-
+        [JsonIgnore]
         public Rol Rol { get; set; }
+        [JsonIgnore]
         public Permiso Permiso { get; set; }
+        [JsonIgnore]
         public Pantalla Pantalla { get; set; }
     }
 }

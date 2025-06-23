@@ -1,0 +1,153 @@
+﻿@using ProtectorAPP.Models.Roles
+@model IEnumerable<RolViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="main-container">
+
+    <div class="row bg-primary tittle d-flex justify-content-between">
+        <div class="col text-white">
+            <h1>Gestión de Roles</h1>
+        </div>
+        <div class="col">
+        </div>
+        <div class="col-auto py-2">
+            <button class="btn text-white" style="background-color:#f97316" data-bs-toggle="modal" data-bs-target="#AddRolModal ">
+                <i class="fas fa-plus"></i> Agregar nuevo
+            </button>
+        </div>
+    </div>
+
+    @* Mostrar mensaje de éxito si existe *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* Mostrar mensaje de error si existe *@
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.IdRol)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Descripcion)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <div>
+                            @Html.DisplayFor(modelItem => item.IdRol)
+                        </div>
+
+                    </td>
+
+                    <td>
+                        <div>
+                            @Html.DisplayFor(modelItem => item.Descripcion)
+                        </div>
+                    </td>
+                    <td>
+                        <a type="button" class="btn btn-details" asp-controller="PermisosRoles" asp-action="Index" asp-route-id="@item.IdRol">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a type="button" class="btn btn-edit" asp-controller="Roles" asp-action="Edit" asp-route-id="@item.IdRol">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        @{
+                            string IDModal = "L" + item.IdRol;
+                        }
+
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-off" data-bs-toggle="modal" data-bs-target="#@IDModal">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="@IDModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Confirmar acción</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ¿Desea eliminar el rol @item.Descripcion?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+
+                                        <form asp-controller="Roles" asp-action="Delete" method="post" asp-route-id="@item.IdRol">
+                                            <button type="submit" class="btn btn-primary">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+
+<!-- Modal -->
+<!-- Modal -->
+<div class="modal fade" id="AddRolModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Agrega un nuevo Rol</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulario que se enviará al controlador -->
+                <form id="formAddRol" asp-action="Create" method="post" asp-controller="Roles">
+                    <!-- Campo para IdRol -->
+                    <div class="form-group">
+                        <label for="idRol">ID del Rol</label>
+                        <input type="number" id="idRol" name="idRol" class="form-control" required />
+                    </div>
+                    <!-- Campo para Descripción -->
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <input type="text" id="descripcion" name="descripcion" class="form-control" required />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <!-- El botón de guardar ahora envía el formulario -->
+                <button type="submit" form="formAddRol" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Sistemas/Index.css" />
+}
+

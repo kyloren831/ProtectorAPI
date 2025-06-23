@@ -3,6 +3,7 @@ using ProtectorAPI.DTOs;
 using ProtectorAPI.Models;
 using ProtectorAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ProtectorAPI.Controllers
 {
@@ -25,6 +26,7 @@ namespace ProtectorAPI.Controllers
 /////////////////////////////////////////////////////////////////////////////////
 
         [HttpGet("Listar")]
+        [Authorize]
         public async Task<ActionResult<List<RolDTO>>> Get()
         {
             try
@@ -53,6 +55,7 @@ namespace ProtectorAPI.Controllers
 /////////////////////////////////////////////////////////////////////////////////
 
         [HttpPost("Guardar")]
+        [Authorize]
         public async Task<ActionResult> Post([FromBody] RolDTO rol)
         {
             using (var transaccion = context.Database.BeginTransaction())
@@ -84,6 +87,7 @@ namespace ProtectorAPI.Controllers
 /////////////////////////////////////////////////////////////////////////////////
 
         [HttpGet("Buscar")]
+        [Authorize]
         public async Task<ActionResult<RolDTO>> Get(int id)
         {
             try
@@ -106,6 +110,7 @@ namespace ProtectorAPI.Controllers
 /////////////////////////////////////////////////////////////////////////////////
 
         [HttpPut("Actualizar")]
+        [Authorize]
         public async Task<ActionResult<Rol>> Put(int id, [FromBody] RolDTO rol)
         {
             if (id != rol.IdRol)
@@ -134,6 +139,32 @@ namespace ProtectorAPI.Controllers
                 {
                     await transaccion.RollbackAsync();
                     return BadRequest(ex.Message);
+                }
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<ActionResult> Eliminar(int id)
+        {
+            using (var transaccion = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var temp = await context.Roles.FindAsync(id);
+                    if (temp == null) return NotFound();
+
+                    context.Roles.Remove(temp);
+                    await context.SaveChangesAsync();
+                    // Confirma la transacción
+                    await transaccion.CommitAsync();
+
+                    return Ok("Rol eliminado Correctamente.");
+                }
+                catch (Exception ex)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest($"Error al cambiar el estado: {ex.Message}");
                 }
             }
         }

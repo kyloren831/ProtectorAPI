@@ -375,6 +375,36 @@ namespace ProtectorAPP.Controllers
                 return View(putPantallaViewModel);
             }
         }
+        public async Task<ActionResult> Listar()
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("JwtToken");
+
+                if (string.IsNullOrEmpty(token))
+                    return RedirectToAction("Login", "Auth");
+
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var response = await httpClient.GetAsync($"Pantallas");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var pantallas = JsonConvert.DeserializeObject<List<PantallaViewModel>>(json);
+                    return Json(pantallas); // Retorna la lista de pantallas en formato JSON
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Error en la respuesta";
+                    return Json(new { success = false, message = "Error en la respuesta del servidor." });
+                }
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = "Error encontrando al usuario";
+                return Json(new { success = false, message = "Error interno al procesar la solicitud." });
+            }
+        }
 
         // GET: PantallasController/Delete/5
         public ActionResult Delete(int id)

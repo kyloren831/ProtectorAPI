@@ -20,7 +20,24 @@ namespace ProtectorAPI.Controllers
             this.context = context;
         }
 
-       
+
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult<List<Pantalla>>> Get()
+        {
+            try
+            {
+                var temp = await context.Pantallas.ToListAsync();
+                if (temp == null) return NotFound();
+                return Ok(temp);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
 
         // GET api/<PantallasController>/5
         [HttpGet("{id}")]

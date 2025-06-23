@@ -1,0 +1,183 @@
+﻿@using ProtectorAPP.Models.Roles
+@model IndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="main-container">
+
+    <div class="row bg-primary tittle d-flex justify-content-between">
+        <div class="col text-white">
+            <h1>Gestión de Permisos para el rol: <span>@Model.IdRol</span></h1>
+        </div>
+        <div class="col">
+        </div>
+        <div class="col-auto py-2">
+            <button class="btn text-white" style="background-color:#f97316" data-bs-toggle="modal" data-bs-target="#AddRolModal ">
+                <i class="fas fa-plus"></i> Agregar nuevo
+            </button>
+        </div>
+    </div>
+
+    @* Mostrar mensaje de éxito si existe *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* Mostrar mensaje de error si existe *@
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Rol
+                </th>
+                <th>
+                    Pantalla
+                </th>
+                <th>
+                    Permiso
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.RolConPermisos)
+            {
+                <tr>
+                    <td>
+                        <div>
+                            @Html.DisplayFor(modelItem => item.IdRol)
+                        </div>
+                        <div>
+                            @Html.DisplayFor(modelItem => item.Rol)
+                        </div>
+                    </td>
+
+                    <td>
+                        <div>
+                            @Html.DisplayFor(modelItem => item.IdPantalla)
+                        </div>
+                        <div>
+                            @Html.DisplayFor(modelItem => item.Pantalla)
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            @Html.DisplayFor(modelItem => item.IdPermiso)
+                        </div>
+                        <div>
+                            @Html.DisplayFor(modelItem => item.Permiso)
+                        </div>
+                    </td>
+                    <td>
+                        @{
+                            string IDModal = "L" + item.IdRol + item.IdPantalla + item.IdPermiso;
+                        }
+
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-off" data-bs-toggle="modal" data-bs-target="#@IDModal">
+                            <i class="fas fa-power-off"></i> Eliminar
+                        </button>
+
+                        <!-- Modal -->
+                        <!-- Modal de Confirmación para eliminar un permiso -->
+                        <div class="modal fade" id="@IDModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Confirmar acción</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ¿Desea eliminar el permiso @item.Permiso en la pantalla @item.Pantalla?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+
+                                        <!-- Formulario para eliminar el permiso -->
+                                        <form asp-controller="PermisosRoles" asp-action="Delete" method="post">
+                                            <input type="hidden" name="idRol" value="@item.IdRol" />
+                                            <input type="hidden" name="idPermiso" value="@item.IdPermiso" />
+                                            <input type="hidden" name="idPantalla" value="@item.IdPantalla" />
+                                            <button type="submit" class="btn btn-primary">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+
+<!-- Modal --><!-- Modal para agregar un nuevo permiso a un rol -->
+<div class="modal fade" id="AddRolModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Agrega un nuevo Permiso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulario para enviar datos -->
+                <form id="formAddPermisoRol" asp-action="Create" method="post" asp-controller="PermisosRoles">
+                    <div class="form-group">
+                        <label for="idRol">ID del Rol:</label>
+                        <input type="number" id="idRol" name="idRol" value="@Model.IdRol" readonly class="form-control" />
+                    </div>
+
+                    <!-- Select para seleccionar una pantalla -->
+                    <div class="form-group">
+                        <label for="idPantalla">Seleccionar Pantalla:</label>
+                        <select name="idPantalla" class="form-select form-select-sm" required>
+                            @foreach (var pantalla in Model.Pantallas)
+                            {
+                                <option value="@pantalla.IdPantalla">@pantalla.Descripcion</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Select para seleccionar un permiso -->
+                    <div class="form-group">
+                        <label for="idPermiso">Seleccionar Permiso:</label>
+                        <select name="idPermiso" class="form-select form-select-sm" required>
+                            @foreach (var permiso in Model.Permisos)
+                            {
+                                <option value="@permiso.IdPermiso">@permiso.Descripcion</option>
+                            }
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="submit" form="formAddPermisoRol" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Sistemas/Index.css" />
+}
+

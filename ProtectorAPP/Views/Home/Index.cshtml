@@ -9,11 +9,15 @@
         <h1 class="display-4">Sistemas</h1>
     </div>
     <div class="row mt-2">
-        @foreach (var item in Model)
+        @if (Model != null)
         {
-            <a href="@Url.Content(item.Url)" class=" btn systems-container">
-                <h4>@item.Descripcion</h4>
-            </a>
+            @foreach (var item in Model)
+            {
+                <a asp-action="Redirigir" asp-controller="Home" asp-route-urlSistema="@item.Url" class=" btn systems-container">
+                    <h4>@item.Descripcion</h4>
+                </a>
+            }
+
         }
         
     </div>

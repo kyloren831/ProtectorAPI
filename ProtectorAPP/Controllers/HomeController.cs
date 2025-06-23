@@ -72,6 +72,18 @@ namespace ProtectorAPP.Controllers
             return View();
         }
 
+        public IActionResult Redirigir(string urlSistema)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                var url = $"{urlSistema}/Home/Index?token={token}";
+                return Redirect(url);
+            }
+
+            return BadRequest("Token no encontrado en sesión.");
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

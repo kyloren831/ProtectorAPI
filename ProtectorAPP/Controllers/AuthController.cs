@@ -23,7 +23,6 @@ namespace ProtectorAPP.Controllers
 
         private bool SonPermisosIguales(List<PantallaConPermisosDTO> permisosTotales, List<PantallaConPermisosDTO> permisosUsuario)
         {
-            /* 
             // Verificar si las listas tienen el mismo número de pantallas
             if (permisosTotales.Count != permisosUsuario.Count)
             {
@@ -51,7 +50,7 @@ namespace ProtectorAPP.Controllers
                 {
                     return false;
                 }
-            }*/
+            }
 
             // Si todas las pantallas y permisos coinciden
             return true;

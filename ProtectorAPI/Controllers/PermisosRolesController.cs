@@ -54,12 +54,7 @@ namespace ProtectorAPI.Controllers
             }
         }
 
-        // GET api/<PermisosRolesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
+       
 
         // POST api/<PermisosRolesController>
         [HttpPost]

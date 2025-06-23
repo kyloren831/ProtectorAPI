@@ -3,6 +3,7 @@ using ProtectorAPI.DTOs;
 using ProtectorAPI.Models;
 using ProtectorAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ProtectorAPI.Controllers
 {
@@ -14,35 +15,39 @@ namespace ProtectorAPI.Controllers
     public class UsuarioPermisoPantallaController : ControllerBase
     {
 
-        private readonly ProtectorDbContext context;
+        private readonly ProtectorDbContext _context;
 
         public UsuarioPermisoPantallaController(ProtectorDbContext context)
         {
-            this.context = context;
+            this._context = context;
         }
 
 /////////////////////////////////////////////////////////////////////////////////
 
-        [HttpGet("Listar")]
-        public async Task<ActionResult<List<UsuarioPermisoPantallaDTO>>> Get()
+        [HttpGet("Listar/{id}")]
+        public async Task<ActionResult<List<UsuarioPermisoDTO>>> Get(int id)
         {
             try
             {
+                var query = from ur in _context.UsuarioPermisosPantallas
+                            join r in _context.Pantallas on ur.IdPantalla equals r.IdPantalla
+                            join p in _context.Permisos on ur.IdPermiso equals p.IdPermiso
+                            join u in _context.Usuarios on ur.IdUsuario equals u.IdUsuario
+                            join s in _context.Sistemas on r.IdPantalla equals s.IdSistema
+                            where ur.IdUsuario == id
+                            select new UsuarioPermisoDTO
+                            {
+                                IdPantalla = r.IdPantalla,
+                                IdUsuario = u.IdUsuario,
+                                IdPermiso = p.IdPermiso,
+                                Sistema = s.Descripcion,
+                                Pantalla = r.Descripcion,
+                                Permiso = p.Descripcion
+                            };
 
-                var UsuarioPermisosPantallas = await context.UsuarioPermisosPantallas.ToListAsync();
-
-                List<UsuarioPermisoPantallaDTO> temp = new List<UsuarioPermisoPantallaDTO>();
-
-                foreach (var UsuarioPermisoPantalla in UsuarioPermisosPantallas)
-                {
-                    temp.Add(new UsuarioPermisoPantallaDTO
-                    {
-                        IdUsuario = UsuarioPermisoPantalla.IdUsuario,
-                        IdPermiso = UsuarioPermisoPantalla.IdPermiso,
-                        IdPantalla = UsuarioPermisoPantalla.IdPantalla
-                    });
-                }
-                return Ok(temp);
+                var permisosRol = query.ToList();
+                if (permisosRol == null) return NotFound();
+                return Ok(permisosRol);
             }
             catch (Exception ex)
             {
@@ -55,7 +60,7 @@ namespace ProtectorAPI.Controllers
         [HttpPost("Guardar")]
         public async Task<ActionResult> Post([FromBody] UsuarioPermisoPantallaDTO usuarioPermisoPantalla)
         {
-            using (var transaccion = context.Database.BeginTransaction())
+            using (var transaccion = _context.Database.BeginTransaction())
             {
                 try
                 {
@@ -66,8 +71,8 @@ namespace ProtectorAPI.Controllers
                         IdPantalla = usuarioPermisoPantalla.IdPantalla
                     };
 
-                    await context.UsuarioPermisosPantallas.AddAsync(temp);
-                    await context.SaveChangesAsync();
+                    await _context.UsuarioPermisosPantallas.AddAsync(temp);
+                    await _context.SaveChangesAsync();
 
                     await transaccion.CommitAsync();
 
@@ -78,6 +83,31 @@ namespace ProtectorAPI.Controllers
                     await transaccion.RollbackAsync();
                     return BadRequest(ex.Message);
 
+                }
+            }
+        }
+        [HttpDelete]
+        [Authorize]
+        public async Task<ActionResult> Delete([FromBody] UsuarioPermisoPantallaDTO permiso)
+        {
+            using (var transaccion = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var temp = await _context.UsuarioPermisosPantallas.FirstOrDefaultAsync(x => x.IdUsuario == permiso.IdUsuario && x.IdPantalla == permiso.IdPantalla && x.IdPermiso == permiso.IdPermiso);
+                    if (temp == null) return NotFound();
+
+                    _context.UsuarioPermisosPantallas.Remove(temp);
+                    await _context.SaveChangesAsync();
+                    // Confirma la transacción
+                    await transaccion.CommitAsync();
+
+                    return Ok("Permiso eliminado Correctamente.");
+                }
+                catch (Exception ex)
+                {
+                    await transaccion.RollbackAsync();
+                    return BadRequest($"Error al eliminar: {ex.Message}");
                 }
             }
         }

@@ -46,6 +46,7 @@ namespace ProtectorAPI.Services
             .GroupBy(up => up.Pantalla)
             .Select(g => new PantallaConPermisosDTO
             {
+                IdSistema = g.Key.IdSistema,
                 IdPantalla = g.Key.IdPantalla,
                 DescripcionPantalla = g.Key.Descripcion,
                 Permisos = g.Select(up => new PermisoDTO
@@ -62,6 +63,7 @@ namespace ProtectorAPI.Services
                 .GroupBy(rp => rp.Pantalla)
                 .Select(g => new PantallaConPermisosDTO
                 {
+                    IdSistema = g.Key.IdSistema,
                     IdPantalla = g.Key.IdPantalla,
                     DescripcionPantalla = g.Key.Descripcion,
                     Permisos = g.Select(rp => new PermisoDTO
@@ -77,6 +79,7 @@ namespace ProtectorAPI.Services
                 .GroupBy(p => p.IdPantalla)
                 .Select(g => new PantallaConPermisosDTO
                 {
+                    IdSistema = g.First().IdSistema,
                     IdPantalla = g.Key,
                     DescripcionPantalla = g.First().DescripcionPantalla,
                     Permisos = g.SelectMany(p => p.Permisos)

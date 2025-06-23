@@ -127,7 +127,8 @@ namespace ProtectorAPP.Controllers
                                 new Claim(ClaimTypes.Name, userName),            // Nombre del usuario
                                 new Claim(ClaimTypes.Email, email),              // Email del usuario
                                 new Claim("UserId", userId),                     // ID del usuario
-                                new Claim(ClaimTypes.Role, "Admin")               // Rol por defecto, puede ser cambiado a Admin
+                                new Claim(ClaimTypes.Role, "Admin"),            // Rol por defecto, puede ser cambiado a Admin
+                                new Claim("PantallasConPermisos", JsonConvert.SerializeObject(permisosUsuario))
                             };
 
                             // Crear la identidad de claims
@@ -136,7 +137,7 @@ namespace ProtectorAPP.Controllers
                             // Propiedades de autenticación
                             var authProperties = new AuthenticationProperties
                             {
-                                IsPersistent = false,                             // Persistente (la cookie durará entre sesiones)
+                                IsPersistent = true,                             // Persistente (la cookie durará entre sesiones)
                                 ExpiresUtc = DateTime.UtcNow.AddMinutes(30)      // Expiración de la cookie (30 minutos)
                             };
 
@@ -152,7 +153,9 @@ namespace ProtectorAPP.Controllers
                                 new Claim(ClaimTypes.Name, userName),            // Nombre del usuario
                                 new Claim(ClaimTypes.Email, email),              // Email del usuario
                                 new Claim("UserId", userId),                     // ID del usuario
-                                new Claim(ClaimTypes.Role, "User")               // Rol por defecto, puede ser cambiado a Admin
+                                new Claim(ClaimTypes.Role, "User"),               // Rol por defecto, puede ser cambiado a Admin
+                                new Claim("PantallasConPermisos", JsonConvert.SerializeObject(permisosUsuario))
+
                             };
 
                             // Crear la identidad de claims

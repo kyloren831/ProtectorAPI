@@ -64,7 +64,7 @@ namespace ProtectorAPI.Controllers
             }
         }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [HttpGet("Listar/ConPantallas")]
         [Authorize]
@@ -72,8 +72,8 @@ namespace ProtectorAPI.Controllers
         {
             try
             {
-                var sistema = await context.Sistemas.Include(x => x.Pantallas).FirstOrDefaultAsync(x=> x.IdSistema == id);
-                if(sistema == null) return NotFound();
+                var sistema = await context.Sistemas.Include(x => x.Pantallas).FirstOrDefaultAsync(x => x.IdSistema == id);
+                if (sistema == null) return NotFound();
 
                 return Ok(sistema);
             }
@@ -111,7 +111,7 @@ namespace ProtectorAPI.Controllers
 
                 List<SistemaDTO> temp = new List<SistemaDTO>();
 
-                foreach(var sistema in sistemas)
+                foreach (var sistema in sistemas)
                 {
                     temp.Add(new SistemaDTO
                     {
@@ -130,7 +130,7 @@ namespace ProtectorAPI.Controllers
             }
         }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [HttpPost("Guardar")]
         [Authorize]
@@ -142,7 +142,7 @@ namespace ProtectorAPI.Controllers
                 {
                     Sistema temp = new Sistema
                     {
-                        IdSistema = sistema.IdSistema, 
+                        IdSistema = sistema.IdSistema,
                         Descripcion = sistema.Descripcion,
                         Url = sistema.Url,
                         Estado = sistema.Estado
@@ -164,15 +164,15 @@ namespace ProtectorAPI.Controllers
             }
         }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         [HttpGet("Buscar")]
         [Authorize]
         public async Task<ActionResult<SistemaDTO>> Get(int id)
         {
             try
             {
-                var sistema = await context.Sistemas.FirstOrDefaultAsync(x=>x.IdSistema ==id);
+                var sistema = await context.Sistemas.FirstOrDefaultAsync(x => x.IdSistema == id);
                 SistemaDTO temp = new SistemaDTO
                 {
                     IdSistema = sistema.IdSistema,
@@ -189,7 +189,46 @@ namespace ProtectorAPI.Controllers
 
         }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        [HttpPost("Buscar/ParaInicio")]
+        [Authorize]
+        public async Task<ActionResult<List<SistemaDTO>>> Post(List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return BadRequest("No se proporcionaron IDs.");
+            }
+
+            try
+            {
+                var sistemas = await context.Sistemas
+                    .Where(x => ids.Contains(x.IdSistema)) // Obtener todos los sistemas en una sola consulta
+                    .Select(x => new SistemaDTO
+                    {
+                        IdSistema = x.IdSistema,
+                        Descripcion = x.Descripcion,
+                        Url = x.Url,
+                        Estado = x.Estado
+                    })
+                    .ToListAsync(); // Ejecuta la consulta y obtiene la lista de resultados
+
+                if (sistemas == null || !sistemas.Any())
+                {
+                    return NotFound("No se encontraron sistemas con los IDs proporcionados.");
+                }
+
+                return Ok(sistemas);
+            }
+            catch (Exception ex)
+            {
+                // Aquí puedes capturar excepciones específicas si lo deseas.
+                // Log de errores (por ejemplo, loggers o herramientas de monitoreo de excepciones)
+                return StatusCode(500, $"Ocurrió un error interno: {ex.Message}");
+            }
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [HttpPut("Actualizar")]
         [Authorize]

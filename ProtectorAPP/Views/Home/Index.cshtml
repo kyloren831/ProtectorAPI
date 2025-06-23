@@ -1,4 +1,6 @@
-﻿@{
+﻿@using ProtectorAPP.Models.Sistemas
+@model List<SistemasViewModel>;
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -7,12 +9,13 @@
         <h1 class="display-4">Sistemas</h1>
     </div>
     <div class="row mt-2">
-        <div class=" btn systems-container">
-            <h4>Inventarios</h4>
-        </div>
-        <div class=" btn systems-container mx-3">
-            <h4>Ventas</h4>
-        </div>
+        @foreach (var item in Model)
+        {
+            <a href="@Url.Content(item.Url)" class=" btn systems-container">
+                <h4>@item.Descripcion</h4>
+            </a>
+        }
+        
     </div>
 </div>
 
